@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="colleague_list">
+        <item>@string/please_choose</item>
+        <item>计算机学院</item>
+        <item>电气学院</item>
+    </string-array>
+    <string-array name="major_list_default">
+        <item>@string/please_choose</item>
+    </string-array>
+    <string-array name="major_list_CS">
+        <item>@string/please_choose</item>
+        <item>软件工程</item>
+        <item>计算机科学</item>
+        <item>信息安全</item>
+        <item>物联网工程</item>
+    </string-array>
+    <string-array name="major_list_E">
+        <item>@string/please_choose</item>
+        <item>电气工程</item>
+        <item>电机工程</item>
+    </string-array>
+</resources>

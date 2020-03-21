@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/search_menu_item"
+        android:icon="@drawable/mirror"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom"
+        android:title="@string/search" />
+    <item
+        android:id="@+id/action_user"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom"
+        android:title="@string/menu">
+        <menu>
+            <item
+                android:id="@+id/add_stu_menu_item"
+                android:title="@string/add" />
+            <item
+                android:id="@+id/refresh_menu_item"
+                android:title="@string/refresh" />
+        </menu>
+    </item>
+
+</menu>
