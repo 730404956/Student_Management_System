@@ -9,21 +9,20 @@
         android:roundIcon="@mipmap/ic"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.acetering.app.ActivityLogin">
+        <activity android:name="com.acetering.app.ViewManagerActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name="com.acetering.app.ActivityLogin">
+
         </activity>
         <activity android:name="com.acetering.app.ActivityMain">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
-        <activity android:name="com.acetering.app.ActivityStudent"></activity>
+        <activity android:name="com.acetering.app.ActivityStudent" />
     </application>
 
 </manifest>

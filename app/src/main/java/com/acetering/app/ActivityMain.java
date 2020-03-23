@@ -181,7 +181,7 @@ public class ActivityMain extends AppCompatActivity {
      * */
     private AlertDialog createConfirmDeleteDialog() {
         builder.setMessage(null);
-        builder.setTitle("确认要删除吗？");
+        builder.setTitle("确定要删除吗？");
         builder.setPositiveButton("确定删除", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -226,6 +226,7 @@ public class ActivityMain extends AppCompatActivity {
                 }
                 searchDialog.cancel();
             }
+
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override

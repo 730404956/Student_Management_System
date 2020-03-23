@@ -2,6 +2,7 @@ package com.acetering.app;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -46,25 +47,6 @@ public class ActivityStudent extends AppCompatActivity {
     private String[] major_e;
     private ArrayAdapter<String> simple_major_adapter;
 
-    private void showDatePicker() {
-        if (datePickerDialog == null) {
-            datePickerDialog = new DatePickerDialog(this);
-            datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-                @Override
-                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                    birthday = new Date();
-                    Log.i(TAG, "onDateSet: " + dayOfMonth);
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(year, month, dayOfMonth);
-                    birthday.setTime(calendar.getTimeInMillis());
-                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
-                    input_stu_birthday.setText(sf.format(birthday));
-                }
-            });
-        }
-        datePickerDialog.show();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +70,27 @@ public class ActivityStudent extends AppCompatActivity {
             setTitle("修改学生信息");
         }
     }
+
+
+    private void showDatePicker() {
+        if (datePickerDialog == null) {
+            datePickerDialog = new DatePickerDialog(this);
+            datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                    birthday = new Date();
+                    Log.i(TAG, "onDateSet: " + dayOfMonth);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(year, month, dayOfMonth);
+                    birthday.setTime(calendar.getTimeInMillis());
+                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+                    input_stu_birthday.setText(sf.format(birthday));
+                }
+            });
+        }
+        datePickerDialog.show();
+    }
+
 
     private void load_spinner_names() {
         Resources res = getResources();
