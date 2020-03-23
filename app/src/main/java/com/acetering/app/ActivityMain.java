@@ -1,16 +1,18 @@
 package com.acetering.app;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Filter;
@@ -28,80 +30,54 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ActivityMain extends AppCompatActivity {
-    public static ActivityMain instance;
+public class ActivityMain extends Fragment {
+    private View contentView;
+    private Context context;
     private ListView stu_list;
     private TextView search_filter;
-    private List<Student> datas;
     private FiltableAdapter<Student> adapter;
-    private String[] stu_names = new String[]{"Jobs", "Lena"};
-    private String[] stu_ids = new String[]{"25037593", "33268512"};
-    private String[] genders = new String[]{"男", "女"};
-    private Date[] birthdays = new Date[]{new Date(), new Date()};
-    private String[] colleagues = new String[]{"计算机学院", "电气学院"};
-    private String[] majors = new String[]{"软件工程", "电气工程"};
+
     private AlertDialog.Builder builder;
     private AlertDialog itemMenuDialog, itemDeleteConfirmDialog;
-    private AlertDialog exitDialog;
-    private AlertDialog searchDialog;
     private Student current_student;
-    Intent it;
-    Bundle bd;
+    private int counter = 0;
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
+    public ActivityMain() {
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.add_stu_menu_item:
-                recordNewStudent();
-                break;
-            case R.id.search_menu_item:
-                if (searchDialog == null) {
-                    searchDialog = createSearchDialog();
-                }
-                searchDialog.show();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
+    public ActivityMain(Context context) {
+        this.context = context;
     }
 
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        if (instance == null) {
-            instance = this;
-        } else {
-            finish();
-        }
-        builder = new AlertDialog.Builder(ActivityMain.this);
-        exitDialog = createExitDialog();
+//        it = new Intent(ActivityMain.this, ActivityStudent.class);
+
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.i("Activity Main", "onCreate: " + counter++);
+        contentView = inflater.inflate(R.layout.activity_main, container, false);
+        builder = new AlertDialog.Builder(context);
         itemMenuDialog = createItemMenuDialog();
         itemDeleteConfirmDialog = createConfirmDeleteDialog();
-        it = new Intent(ActivityMain.this, ActivityStudent.class);
-        loadData();
         bindView();
+        return contentView;
     }
 
-    private void loadData() {
-        datas = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            datas.add(new Student(stu_names[i], stu_ids[i], genders[i], birthdays[i], colleagues[i], majors[i]));
-        }
-    }
 
     /***
      * 绑定视图
      */
     private void bindView() {
-        search_filter = findViewById(R.id.search_text);
-        stu_list = findViewById(R.id.stu_list);
-        ImageView btn_record = findViewById(R.id.btn_record_student);
+        search_filter = contentView.findViewById(R.id.search_text);
+        stu_list = contentView.findViewById(R.id.stu_list);
+        ImageView btn_record = contentView.findViewById(R.id.btn_record_student);
         //新增学生
         btn_record.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,7 +86,7 @@ public class ActivityMain extends AppCompatActivity {
             }
         });
         //显示适配器视图绑定配置
-        adapter = new FiltableAdapter<Student>(this, datas, R.layout.student_info_item) {
+        adapter = new FiltableAdapter<Student>(context, ViewManagerActivity.getInstance().datas, R.layout.student_info_item) {
             @Override
             protected void bindView(ViewHolder holder, Student item) {
                 String sex_male = getString(R.string.sex_male);
@@ -118,20 +94,21 @@ public class ActivityMain extends AppCompatActivity {
                         .setText(R.id.stu_id, item.getStu_id())
                         .setText(R.id.stu_colleague, item.getColleague())
                         .setText(R.id.stu_major, item.getMajor())
-                        .setImage(R.id.gender_img, getDrawable(item.getGender().equals(sex_male) ? R.drawable.male : R.drawable.female))
-                        .setImage(R.id.stu_img, getDrawable(item.getGender().equals(sex_male) ? R.drawable.jobs : R.drawable.lena));
+                        .setImage(R.id.gender_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.male : R.drawable.female))
+                        .setImage(R.id.stu_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.jobs : R.drawable.lena));
             }
         };
         adapter.setOnDataSetInvalid(new CallbackEvent() {
             @Override
             public void doJob(Context context) {
-                ImageToast.make(ActivityMain.this, R.drawable.no, "没有查询到任何学生的信息！").show();
+                ImageToast.make(context, R.drawable.no, "没有查询到任何学生的信息！").show();
             }
         });
         adapter.setOnResult(new CallbackEvent() {
             @Override
             public void doJob(Context context) {
-                search_filter.setText(search_filter.getTag().toString() + " 共有" + adapter.getCount() + "条结果。");
+                if (search_filter.getVisibility() != View.GONE)
+                    search_filter.setText(search_filter.getTag().toString() + " 共有" + adapter.getCount() + "条结果。");
             }
         });
         //设置列表项监听
@@ -159,10 +136,7 @@ public class ActivityMain extends AppCompatActivity {
         builder.setPositiveButton(R.string.edit, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                bd = new Bundle();
-                bd.putSerializable("student", current_student);
-                it.putExtra("stu_bd", bd);
-                startActivity(it);
+                ViewManagerActivity.getInstance().changeToStudentFragment(current_student);
             }
         });
         builder.setNegativeButton(R.string.remove, new DialogInterface.OnClickListener() {
@@ -192,78 +166,42 @@ public class ActivityMain extends AppCompatActivity {
         return builder.create();
     }
 
-    private AlertDialog createExitDialog() {
-        builder.setTitle("提示");
-        builder.setMessage("确定要退出吗？");
-        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });
-        builder.setNegativeButton(R.string.cancel, null);
-        return builder.create();
-    }
-
-    private AlertDialog createSearchDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("搜索");
-        View view = LayoutInflater.from(this).inflate(R.layout.input_dialog, null);
-        builder.setView(view);
-        EditText input = view.findViewById(R.id.editText);
-        builder.setPositiveButton(R.string.search, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String input_text = input.getText().toString();
-                Filter filter = adapter.getFilter(Student.class);
-                filter.filter(input_text);
-                if (input_text.length() > 0) {
-                    search_filter.setTag(getText(R.string.search) + "  " + input_text);
-                    search_filter.setText(search_filter.getTag().toString());
-                    search_filter.setVisibility(View.VISIBLE);
-                } else {
-                    search_filter.setVisibility(View.GONE);
-                }
-                searchDialog.cancel();
-            }
-
-        });
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                input.setText("");
-                search_filter.setVisibility(View.GONE);
-                Filter filter = adapter.getFilter(Student.class);
-                filter.filter("");
-                searchDialog.cancel();
-            }
-        });
-        return builder.create();
-    }
-
-    @Override
-    public void onBackPressed() {
-        exitDialog.show();
-    }
 
     public void addNewStudent(Student student) {
         if (adapter.addOrModify(student)) {
-            ImageToast.make(this, R.drawable.yes, "添加学生" + student.getStu_name() + "成功！").show();
+            ImageToast.make(context, R.drawable.yes, "添加学生" + student.getStu_name() + "成功！").show();
         } else {
-            ImageToast.make(this, R.drawable.yes, "修改学生" + student.getStu_name() + "成功！").show();
+            ImageToast.make(context, R.drawable.yes, "修改学生" + student.getStu_name() + "成功！").show();
         }
     }
 
     public void removeStudent(Student student) {
         adapter.removeItem(current_student);
-        ImageToast.make(this, R.drawable.yes, "删除学生" + student.getStu_name() + "成功！").show();
+        ImageToast.make(context, R.drawable.yes, "删除学生" + student.getStu_name() + "成功！").show();
     }
 
     /**
      * start a new activity to record new student
      */
     public void recordNewStudent() {
-        startActivity(new Intent(ActivityMain.this, ActivityStudent.class));
+        ViewManagerActivity.getInstance().changeToStudentFragment();
     }
 
+    public void filter(String input_text) {
+        Filter filter = adapter.getFilter(Student.class);
+        filter.filter(input_text);
+        if (input_text.length() > 0) {
+            search_filter.setTag(getText(R.string.search) + "  " + input_text);
+            search_filter.setText(search_filter.getTag().toString());
+            search_filter.setVisibility(View.VISIBLE);
+        } else {
+            search_filter.setVisibility(View.GONE);
+        }
+    }
+
+    public void clearFilter() {
+        search_filter.setVisibility(View.GONE);
+        Filter filter = adapter.getFilter(Student.class);
+        filter.filter("");
+    }
 }

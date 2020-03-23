@@ -111,7 +111,7 @@ public class ActivityLogin extends AppCompatActivity {
             context.pgDialog.cancel();
             switch (msg.what) {
                 case 0://登录成功
-                    context.startActivity(new Intent(context, ActivityMain.class));
+                    context.startActivity(new Intent(context, ViewManagerActivity.class));
                     break;
                 case 1://账号不存在
                 case 2://账号和密码不匹配

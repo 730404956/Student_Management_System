@@ -1,15 +1,18 @@
 package com.acetering.app;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
+import androidx.fragment.app.Fragment;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -28,7 +31,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-public class ActivityStudent extends AppCompatActivity {
+public class ActivityStudent extends Fragment {
+    private View contentView;
     private EditText input_name;
     private Context context;
     private EditText input_stu_id;
@@ -47,34 +51,49 @@ public class ActivityStudent extends AppCompatActivity {
     private String[] major_e;
     private ArrayAdapter<String> simple_major_adapter;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_student);
+    private int counter = 0;
 
-        context = this;
-        load_spinner_names();
-        bindView();
-        Student student = null;
-        try {
-            student = (Student) getIntent().getBundleExtra("stu_bd").get("student");
-        } catch (NullPointerException e) {
-        }
-        if (student == null) {
-            Log.i(TAG, "onCreate: haha empty");
-            setTitle(R.string.app_name);
-            input_stu_birthday.setText(getText(R.string.please_choose));
-        } else {
-            this.student = student;
-            initData(student);
-            setTitle("修改学生信息");
-        }
+    public ActivityStudent() {
     }
 
+    public ActivityStudent(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        load_spinner_names();
+
+
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.i(TAG, "onCreateView: student" + counter++);
+        contentView = inflater.inflate(R.layout.activity_student, container, false);
+        bindView();
+        return contentView;
+    }
+
+    @Override
+    public void onResume() {
+        Log.i(TAG, "resume");
+        initData(student);
+        super.onResume();
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+        if (select_majors != null)
+            initData(student);
+
+    }
 
     private void showDatePicker() {
         if (datePickerDialog == null) {
-            datePickerDialog = new DatePickerDialog(this);
+            datePickerDialog = new DatePickerDialog(context);
             datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
                 @Override
                 public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -101,33 +120,39 @@ public class ActivityStudent extends AppCompatActivity {
     }
 
     private void initData(Student student) {
-        input_name.setText(student.getStu_name());
-        input_stu_id.setText(student.getStu_id());
-        if (student.getGender().equals(((RadioButton) select_sex.getChildAt(0)).getText().toString())) {
-            ((RadioButton) select_sex.getChildAt(0)).setChecked(true);
+        if (student == null) {
+            input_name.setText("");
+            input_stu_id.setText("");
+            input_stu_birthday.setText(getText(R.string.please_choose));
+            select_colleagues.setSelection(0);
         } else {
-            ((RadioButton) select_sex.getChildAt(1)).setChecked(true);
-        }
-        birthday = student.getBirthday();
-        input_stu_birthday.setText(new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()));
-        for (int i = 0; i < colleague_names.length; i++) {
-            if (student.getColleague().equals(colleague_names[i])) {
-                select_colleagues.setSelection(i);
-                break;
+            input_name.setText(student.getStu_name());
+            input_stu_id.setText(student.getStu_id());
+            if (student.getGender().equals(((RadioButton) select_sex.getChildAt(0)).getText().toString())) {
+                ((RadioButton) select_sex.getChildAt(0)).setChecked(true);
+            } else {
+                ((RadioButton) select_sex.getChildAt(1)).setChecked(true);
+            }
+            birthday = student.getBirthday();
+            input_stu_birthday.setText(new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()));
+            for (int i = 0; i < colleague_names.length; i++) {
+                if (student.getColleague().equals(colleague_names[i])) {
+                    select_colleagues.setSelection(i);
+                    break;
+                }
             }
         }
-
     }
 
     private void bindView() {
-        input_name = findViewById(R.id.input_name);
-        input_stu_id = findViewById(R.id.input_stu_id);
-        select_sex = findViewById(R.id.select_sex);
-        input_stu_birthday = findViewById(R.id.input_stu_birthday);
-        select_colleagues = findViewById(R.id.select_colleague);
-        select_majors = findViewById(R.id.select_major);
-        Button btn_confirm = findViewById(R.id.btn_confirm);
-        Button btn_cancel = findViewById(R.id.btn_cancel);
+        input_name = contentView.findViewById(R.id.input_name);
+        input_stu_id = contentView.findViewById(R.id.input_stu_id);
+        select_sex = contentView.findViewById(R.id.select_sex);
+        input_stu_birthday = contentView.findViewById(R.id.input_stu_birthday);
+        select_colleagues = contentView.findViewById(R.id.select_colleague);
+        select_majors = contentView.findViewById(R.id.select_major);
+        Button btn_confirm = contentView.findViewById(R.id.btn_confirm);
+        Button btn_cancel = contentView.findViewById(R.id.btn_cancel);
         if (dialog == null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("提示");
@@ -141,11 +166,11 @@ public class ActivityStudent extends AppCompatActivity {
             }
         });
         //bind adapter for colleague spinner
-        final ArrayAdapter<String> simple_colleague_adpter = new ArrayAdapter<>(this, R.layout.simple_string_spinner_item);
+        final ArrayAdapter<String> simple_colleague_adpter = new ArrayAdapter<>(context, R.layout.simple_string_spinner_item);
         simple_colleague_adpter.addAll(colleague_names);
         select_colleagues.setAdapter(simple_colleague_adpter);
         //bind adapter for major spinner
-        simple_major_adapter = new ArrayAdapter<>(this, R.layout.simple_string_spinner_item);
+        simple_major_adapter = new ArrayAdapter<String>(context, R.layout.simple_string_spinner_item);
         simple_major_adapter.addAll(major_default);
         select_majors.setAdapter(simple_major_adapter);
         //connect content for colleague and major
@@ -221,11 +246,10 @@ public class ActivityStudent extends AppCompatActivity {
                     dialog.show();
                     return;
                 }
-                String sex = String.valueOf(((RadioButton) findViewById(select_sex.getCheckedRadioButtonId())).getText());
+                String sex = String.valueOf(((RadioButton) contentView.findViewById(select_sex.getCheckedRadioButtonId())).getText());
                 String colleague = select_colleagues.getSelectedItem().toString();
                 String major = select_majors.getSelectedItem().toString();
-                ActivityMain.instance.addNewStudent(Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major)));
-                finish();
+                ViewManagerActivity.getInstance().addNewStudent(Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major)));
             }
         });
         //bind listener for btn_cancel
@@ -242,4 +266,5 @@ public class ActivityStudent extends AppCompatActivity {
             }
         });
     }
+
 }
