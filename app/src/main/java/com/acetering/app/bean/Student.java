@@ -4,10 +4,8 @@ import com.acetering.app.adapter.IFiltableData;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
@@ -97,7 +95,11 @@ public class Student implements Serializable, IFiltableData {
         a.gender = student.gender;
         a.colleague = student.colleague;
         a.major = student.major;
-        a.birthday = (Date) student.birthday.clone();
+        if (student.birthday == null) {
+            a.birthday = null;
+        } else {
+            a.birthday = (Date) student.birthday.clone();
+        }
         return a;
     }
 

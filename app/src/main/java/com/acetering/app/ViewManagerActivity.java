@@ -3,9 +3,8 @@ package com.acetering.app;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -13,13 +12,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewManager;
 import android.widget.EditText;
-import android.widget.Filter;
-import android.widget.TextView;
 
+import com.acetering.app.adapter.MyFragmentAdapter;
 import com.acetering.app.bean.Student;
 import com.acetering.student_input.R;
 
@@ -27,8 +23,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ViewManagerActivity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener {
-
+public class ViewManagerActivity extends AppCompatActivity {
 
     private String[] stu_names = new String[]{"Jobs", "Lena"};
     private String[] stu_ids = new String[]{"25037593", "33268512"};
@@ -36,13 +31,13 @@ public class ViewManagerActivity extends AppCompatActivity implements View.OnCli
     private Date[] birthdays = new Date[]{new Date(), new Date()};
     private String[] colleagues = new String[]{"计算机学院", "电气学院"};
     private String[] majors = new String[]{"软件工程", "电气工程"};
-
+    ViewPager pager;
+    MyFragmentAdapter adapter;
 
     private static ViewManagerActivity instance;
     FragmentManager fManager;
-    ActivityMain fragment_main;
-    ActivityStudent fragment_student;
-    TextView t1, t2;
+    FragmentMain fragment_main;
+    FragmentStudent fragment_student;
     List<Student> datas;
     private AlertDialog searchDialog;
     private int counter = 0;
@@ -61,12 +56,16 @@ public class ViewManagerActivity extends AppCompatActivity implements View.OnCli
         setContentView(R.layout.activity_view_manager);
         //get fragment manager
         fManager = getSupportFragmentManager();
-        t1 = findViewById(R.id.t1);
-        t1.setOnClickListener(this);
-        t2 = findViewById(R.id.t2);
-        t2.setOnClickListener(this);
+        fragment_main = new FragmentMain();
+        fragment_student = new FragmentStudent();
         instance = this;
         loadData();
+        pager = findViewById(R.id.ly_content);
+        List<Fragment> fragments = new ArrayList<>();
+        fragments.add(fragment_main);
+        fragments.add(fragment_student);
+        adapter = new MyFragmentAdapter(fManager, fragments);
+        pager.setAdapter(adapter);
         Log.i("ViewManagerActivity", "onCreate: " + counter++);
     }
 
@@ -116,42 +115,17 @@ public class ViewManagerActivity extends AppCompatActivity implements View.OnCli
         searchDialog.show();
     }
 
-    @Override
-    public void onClick(View v) {
-        Log.i("view manager", "onClick: " + v.isSelected());
-        if (!v.isSelected()) {
-            if (v == t1) {
-                t2.setSelected(false);
-                t1.setSelected(true);
-                changeToMainFragment();
-            } else if (v == t2) {
-                t2.setSelected(true);
-                t1.setSelected(false);
-                changeToStudentFragment();
-            }
-        }
-    }
-
     private void changeFragment(Fragment fragment) {
-        assert (fragment != null);
-        FragmentTransaction transaction = fManager.beginTransaction();
-        if (fragment_main != null)
-            transaction.hide(fragment_main);
-        if (fragment_student != null)
-            transaction.hide(fragment_student);
-        transaction.show(fragment);
-        transaction.commit();
-
+        int index = adapter.getItemId(fragment);
+        Log.i("view manager", "changeFragment: " + index);
+        pager.setCurrentItem(index);
     }
 
 
     public void changeToStudentFragment(Student student) {
-        t1.setSelected(false);
-        t2.setSelected(true);
         if (fragment_student == null) {
-            fragment_student = new ActivityStudent(this);
+            fragment_student = new FragmentStudent();
             fragment_student.setStudent(student);
-            fManager.beginTransaction().add(R.id.ly_content, fragment_student).commit();
         } else {
             fragment_student.setStudent(student);
             changeFragment(fragment_student);
@@ -163,11 +137,8 @@ public class ViewManagerActivity extends AppCompatActivity implements View.OnCli
     }
 
     public void changeToMainFragment() {
-        t1.setSelected(true);
-        t2.setSelected(false);
         if (fragment_main == null) {
-            fragment_main = new ActivityMain(this);
-            fManager.beginTransaction().add(R.id.ly_content, fragment_main).commit();
+            fragment_main = new FragmentMain();
             return;
         }
         changeFragment(fragment_main);
@@ -181,8 +152,4 @@ public class ViewManagerActivity extends AppCompatActivity implements View.OnCli
         return instance;
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        return false;
-    }
 }

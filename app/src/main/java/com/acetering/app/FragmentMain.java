@@ -7,16 +7,13 @@ import androidx.fragment.app.Fragment;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.Filter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,11 +23,8 @@ import com.acetering.app.bean.Student;
 import com.acetering.app.event.CallbackEvent;
 import com.acetering.student_input.R;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
-public class ActivityMain extends Fragment {
+public class FragmentMain extends Fragment {
     private View contentView;
     private Context context;
     private ListView stu_list;
@@ -42,20 +36,14 @@ public class ActivityMain extends Fragment {
     private Student current_student;
     private int counter = 0;
 
-    public ActivityMain() {
-    }
-
-    public ActivityMain(Context context) {
-        this.context = context;
+    public FragmentMain() {
     }
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        this.context = ViewManagerActivity.getInstance();
         super.onCreate(savedInstanceState);
-//        it = new Intent(ActivityMain.this, ActivityStudent.class);
-
-
     }
 
     @Nullable
@@ -77,14 +65,6 @@ public class ActivityMain extends Fragment {
     private void bindView() {
         search_filter = contentView.findViewById(R.id.search_text);
         stu_list = contentView.findViewById(R.id.stu_list);
-        ImageView btn_record = contentView.findViewById(R.id.btn_record_student);
-        //新增学生
-        btn_record.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                recordNewStudent();
-            }
-        });
         //显示适配器视图绑定配置
         adapter = new FiltableAdapter<Student>(context, ViewManagerActivity.getInstance().datas, R.layout.student_info_item) {
             @Override
@@ -191,7 +171,7 @@ public class ActivityMain extends Fragment {
         Filter filter = adapter.getFilter(Student.class);
         filter.filter(input_text);
         if (input_text.length() > 0) {
-            search_filter.setTag(getText(R.string.search) + "  " + input_text);
+            search_filter.setTag(getText(R.string.search) + "  \"" + input_text + "\"");
             search_filter.setText(search_filter.getTag().toString());
             search_filter.setVisibility(View.VISIBLE);
         } else {

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.acetering.app.ActivityStudent">
+    tools:context="com.acetering.app.FragmentStudent">
 
     <LinearLayout
         android:layout_width="match_parent"

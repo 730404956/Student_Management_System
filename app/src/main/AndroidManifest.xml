@@ -19,10 +19,10 @@
         <activity android:name="com.acetering.app.ActivityLogin">
 
         </activity>
-        <activity android:name="com.acetering.app.ActivityMain">
+        <activity android:name="com.acetering.app.FragmentMain">
 
         </activity>
-        <activity android:name="com.acetering.app.ActivityStudent" />
+        <activity android:name="com.acetering.app.FragmentStudent" />
     </application>
 
 </manifest>

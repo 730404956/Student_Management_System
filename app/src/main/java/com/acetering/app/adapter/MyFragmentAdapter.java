@@ -11,7 +11,6 @@ import androidx.fragment.app.FragmentPagerAdapter;
  * On 2020/3/23
  */
 public class MyFragmentAdapter extends FragmentPagerAdapter {
-    //TODO: use this class to implements fragment slide change
 
     List<Fragment> list;
 
@@ -30,5 +29,8 @@ public class MyFragmentAdapter extends FragmentPagerAdapter {
         return list.size();
     }//设置Item的数量
 
+    public int getItemId(Fragment item) {
+        return list.indexOf(item);
+    }
 
 }

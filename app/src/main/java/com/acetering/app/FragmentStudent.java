@@ -31,7 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-public class ActivityStudent extends Fragment {
+public class FragmentStudent extends Fragment {
     private View contentView;
     private EditText input_name;
     private Context context;
@@ -53,35 +53,47 @@ public class ActivityStudent extends Fragment {
 
     private int counter = 0;
 
-    public ActivityStudent() {
+    public FragmentStudent() {
     }
 
-    public ActivityStudent(Context context) {
-        this.context = context;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.context = ViewManagerActivity.getInstance();
         load_spinner_names();
-
-
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.i(TAG, "onCreateView: student" + counter++);
+        Log.i(TAG, "onCreateView: student " + counter++);
+        if (savedInstanceState != null)
+            student = (Student) savedInstanceState.get("student");
         contentView = inflater.inflate(R.layout.activity_student, container, false);
         bindView();
         return contentView;
     }
+
 
     @Override
     public void onResume() {
         Log.i(TAG, "resume");
         initData(student);
         super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        Log.i(TAG, "onPause: ");
+        String name = input_name.getText().toString();
+        String stu_id = input_stu_id.getText().toString();
+        String sex = String.valueOf(((RadioButton) contentView.findViewById(select_sex.getCheckedRadioButtonId())).getText());
+        String colleague = select_colleagues.getSelectedItem().toString();
+        String major = select_majors.getSelectedItem().toString();
+        Student student_instance = Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major));
+        student = student_instance;
+        super.onPause();
     }
 
     public void setStudent(Student student) {
@@ -110,10 +122,15 @@ public class ActivityStudent extends Fragment {
         datePickerDialog.show();
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putSerializable("student", student);
+        super.onSaveInstanceState(outState);
+    }
 
     private void load_spinner_names() {
         Resources res = getResources();
-        colleague_names = getResources().getStringArray(R.array.colleague_list);
+        colleague_names = res.getStringArray(R.array.colleague_list);
         major_default = res.getStringArray(R.array.major_list_default);
         major_cs = res.getStringArray(R.array.major_list_CS);
         major_e = res.getStringArray(R.array.major_list_E);
@@ -121,10 +138,7 @@ public class ActivityStudent extends Fragment {
 
     private void initData(Student student) {
         if (student == null) {
-            input_name.setText("");
-            input_stu_id.setText("");
-            input_stu_birthday.setText(getText(R.string.please_choose));
-            select_colleagues.setSelection(0);
+            clearData();
         } else {
             input_name.setText(student.getStu_name());
             input_stu_id.setText(student.getStu_id());
@@ -134,7 +148,11 @@ public class ActivityStudent extends Fragment {
                 ((RadioButton) select_sex.getChildAt(1)).setChecked(true);
             }
             birthday = student.getBirthday();
-            input_stu_birthday.setText(new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()));
+            if (birthday == null) {
+                input_stu_birthday.setText(getText(R.string.please_choose));
+            } else {
+                input_stu_birthday.setText(new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()));
+            }
             for (int i = 0; i < colleague_names.length; i++) {
                 if (student.getColleague().equals(colleague_names[i])) {
                     select_colleagues.setSelection(i);
@@ -142,6 +160,14 @@ public class ActivityStudent extends Fragment {
                 }
             }
         }
+    }
+
+    private void clearData() {
+        input_name.setText("");
+        input_stu_id.setText("");
+        input_stu_birthday.setText(getText(R.string.please_choose));
+        birthday = null;
+        select_colleagues.setSelection(0);
     }
 
     private void bindView() {
@@ -250,6 +276,7 @@ public class ActivityStudent extends Fragment {
                 String colleague = select_colleagues.getSelectedItem().toString();
                 String major = select_majors.getSelectedItem().toString();
                 ViewManagerActivity.getInstance().addNewStudent(Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major)));
+                student = null;
             }
         });
         //bind listener for btn_cancel
@@ -257,9 +284,7 @@ public class ActivityStudent extends Fragment {
             @Override
             public void onClick(View v) {
                 if (student == null) {
-                    input_name.setText("");
-                    input_stu_id.setText("");
-                    select_colleagues.setSelection(0);
+                    clearData();
                 } else {
                     initData(student);
                 }
