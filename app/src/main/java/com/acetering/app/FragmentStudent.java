@@ -51,6 +51,7 @@ public class FragmentStudent extends Fragment {
     private String[] major_e;
     private ArrayAdapter<String> simple_major_adapter;
 
+    //use for debug
     private int counter = 0;
 
     public FragmentStudent() {
@@ -72,6 +73,7 @@ public class FragmentStudent extends Fragment {
             student = (Student) savedInstanceState.get("student");
         contentView = inflater.inflate(R.layout.activity_student, container, false);
         bindView();
+        ViewManagerActivity.getInstance().replaceStudentFragment(this);
         return contentView;
     }
 

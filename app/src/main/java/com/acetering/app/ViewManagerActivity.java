@@ -1,5 +1,6 @@
 package com.acetering.app;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -20,6 +21,7 @@ import com.acetering.app.bean.Student;
 import com.acetering.student_input.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -43,10 +45,15 @@ public class ViewManagerActivity extends AppCompatActivity {
     private int counter = 0;
 
 
-    private void loadData() {
+    private void loadData(Bundle savedInstance) {
         datas = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            datas.add(new Student(stu_names[i], stu_ids[i], genders[i], birthdays[i], colleagues[i], majors[i]));
+        if (savedInstance != null) {
+            Student[] students = (Student[]) (savedInstance.get("datas"));
+            datas.addAll(Arrays.asList(students));
+        } else {
+            for (int i = 0; i < 2; i++) {
+                datas.add(new Student(stu_names[i], stu_ids[i], genders[i], birthdays[i], colleagues[i], majors[i]));
+            }
         }
     }
 
@@ -59,7 +66,7 @@ public class ViewManagerActivity extends AppCompatActivity {
         fragment_main = new FragmentMain();
         fragment_student = new FragmentStudent();
         instance = this;
-        loadData();
+        loadData(savedInstanceState);
         pager = findViewById(R.id.ly_content);
         List<Fragment> fragments = new ArrayList<>();
         fragments.add(fragment_student);
@@ -145,6 +152,23 @@ public class ViewManagerActivity extends AppCompatActivity {
         changeFragment(fragment_main);
     }
 
+    public void replaceMainFragment(FragmentMain fragment_main) {
+        this.fragment_main = fragment_main;
+        adapter.replace(fragment_main, 1);
+    }
+
+    public void replaceStudentFragment(FragmentStudent fragment) {
+        this.fragment_student = fragment;
+        adapter.replace(fragment_student, 0);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Student[] students = new Student[datas.size()];
+        datas.toArray(students);
+        outState.putSerializable("datas", students);
+    }
 
     public void addNewStudent(Student student) {
         fragment_main.addNewStudent(student);

@@ -23,13 +23,17 @@ import com.acetering.app.bean.Student;
 import com.acetering.app.event.CallbackEvent;
 import com.acetering.student_input.R;
 
-
+/**
+ * Author:Acetering
+ * Last Update:2020/3/25
+ */
 public class FragmentMain extends Fragment {
     private View contentView;
     private Context context;
     private ListView stu_list;
     private TextView search_filter;
     private FiltableAdapter<Student> adapter;
+    private String filter_key_words;
 
     private AlertDialog.Builder builder;
     private AlertDialog itemMenuDialog, itemDeleteConfirmDialog;
@@ -50,20 +54,40 @@ public class FragmentMain extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.i("Activity Main", "onCreate: " + counter++);
+        //get content view
         contentView = inflater.inflate(R.layout.activity_main, container, false);
+        //create dialog builder
         builder = new AlertDialog.Builder(context);
+        //create item long click dialog
         itemMenuDialog = createItemMenuDialog();
+        //create delete confirm dialog
         itemDeleteConfirmDialog = createConfirmDeleteDialog();
+        //init view
         bindView();
+        //get filter keywords to load filter result
+        if (savedInstanceState != null) {
+            filter_key_words = (String) savedInstanceState.get("filter_key_words");
+        }
+        //replace instance of view manager
+        ViewManagerActivity.getInstance().replaceMainFragment(this);
         return contentView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        //reload filter result after back to front
+        adapter.getFilter(Student.class).filter(filter_key_words);
+    }
 
     /***
      * 绑定视图
      */
     private void bindView() {
+        Log.i("main", "bindView: ");
+        //get search_filter info from xml
         search_filter = contentView.findViewById(R.id.search_text);
+        //get list view from xml
         stu_list = contentView.findViewById(R.id.stu_list);
         //显示适配器视图绑定配置
         adapter = new FiltableAdapter<Student>(context, ViewManagerActivity.getInstance().datas, R.layout.student_info_item) {
@@ -78,17 +102,19 @@ public class FragmentMain extends Fragment {
                         .setImage(R.id.stu_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.jobs : R.drawable.lena));
             }
         };
+        //set message when filter result of nothing
         adapter.setOnDataSetInvalid(new CallbackEvent() {
             @Override
             public void doJob(Context context) {
                 ImageToast.make(context, R.drawable.no, "没有查询到任何学生的信息！").show();
             }
         });
+        //set listener for filter finished
         adapter.setOnResult(new CallbackEvent() {
             @Override
             public void doJob(Context context) {
-                if (search_filter.getVisibility() != View.GONE)
-                    search_filter.setText(search_filter.getTag().toString() + " 共有" + adapter.getCount() + "条结果。");
+                //update text in search info
+                showSearchFilter(filter_key_words);
             }
         });
         //设置列表项监听
@@ -104,6 +130,7 @@ public class FragmentMain extends Fragment {
                 return false;
             }
         });
+        //set adapter for list view
         stu_list.setAdapter(adapter);
     }
 
@@ -113,12 +140,15 @@ public class FragmentMain extends Fragment {
      * @return 创建的对话框
      */
     private AlertDialog createItemMenuDialog() {
+        //do something after click 'edit'
         builder.setPositiveButton(R.string.edit, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                //turn to change student info view
                 ViewManagerActivity.getInstance().changeToStudentFragment(current_student);
             }
         });
+        //do something after click 'delete'
         builder.setNegativeButton(R.string.remove, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -168,20 +198,31 @@ public class FragmentMain extends Fragment {
     }
 
     public void filter(String input_text) {
+        filter_key_words = input_text;
         Filter filter = adapter.getFilter(Student.class);
         filter.filter(input_text);
-        if (input_text.length() > 0) {
-            search_filter.setTag(getText(R.string.search) + "  \"" + input_text + "\"");
-            search_filter.setText(search_filter.getTag().toString());
+
+    }
+
+    private void showSearchFilter(String keywords) {
+        if (keywords == null)
+            return;
+        if (keywords.length() > 0) {
             search_filter.setVisibility(View.VISIBLE);
+            search_filter.setText(getText(R.string.search) + "  \"" + keywords + "\"" + " 共有" + adapter.getCount() + "条结果。");
         } else {
             search_filter.setVisibility(View.GONE);
         }
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putSerializable("filter_key_words", filter_key_words);
+    }
+
     public void clearFilter() {
-        search_filter.setVisibility(View.GONE);
+        filter_key_words = "";
         Filter filter = adapter.getFilter(Student.class);
-        filter.filter("");
+        filter.filter(filter_key_words);
     }
 }

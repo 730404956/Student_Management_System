@@ -87,7 +87,7 @@ public class ActivityLogin extends AppCompatActivity {
         builder.setView(view_custom);
         //设置不可取消
         builder.setCancelable(false);
-
+        //create dialog
         pgDialog = builder.create();
         return pgDialog;
     }
@@ -102,6 +102,7 @@ public class ActivityLogin extends AppCompatActivity {
             @Override
             public void onProgressReached() {
                 startActivity(new Intent(ActivityLogin.this, ViewManagerActivity.class));
+                adsDialog.cancel();
             }
         });
         //set click to skip ads

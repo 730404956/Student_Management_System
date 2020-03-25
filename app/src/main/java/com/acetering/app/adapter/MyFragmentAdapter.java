@@ -33,4 +33,7 @@ public class MyFragmentAdapter extends FragmentPagerAdapter {
         return list.indexOf(item);
     }
 
+    public void replace(Fragment item, int id) {
+        list.set(id, item);
+    }
 }
