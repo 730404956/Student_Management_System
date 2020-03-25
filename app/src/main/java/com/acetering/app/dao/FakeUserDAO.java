@@ -13,6 +13,5 @@ public class FakeUserDAO implements I_UserDAO {
         } else {
             return null;
         }
-
     }
 }

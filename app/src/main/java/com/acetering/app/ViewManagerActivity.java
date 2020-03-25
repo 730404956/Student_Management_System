@@ -62,10 +62,11 @@ public class ViewManagerActivity extends AppCompatActivity {
         loadData();
         pager = findViewById(R.id.ly_content);
         List<Fragment> fragments = new ArrayList<>();
-        fragments.add(fragment_main);
         fragments.add(fragment_student);
+        fragments.add(fragment_main);
         adapter = new MyFragmentAdapter(fManager, fragments);
         pager.setAdapter(adapter);
+        changeToMainFragment();
         Log.i("ViewManagerActivity", "onCreate: " + counter++);
     }
 
@@ -103,7 +104,7 @@ public class ViewManagerActivity extends AppCompatActivity {
                     searchDialog.cancel();
                 }
             });
-            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(R.string.clear_filter, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     fragment_main.clearFilter();
@@ -143,6 +144,7 @@ public class ViewManagerActivity extends AppCompatActivity {
         }
         changeFragment(fragment_main);
     }
+
 
     public void addNewStudent(Student student) {
         fragment_main.addNewStudent(student);

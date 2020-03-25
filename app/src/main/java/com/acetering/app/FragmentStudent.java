@@ -276,7 +276,7 @@ public class FragmentStudent extends Fragment {
                 String colleague = select_colleagues.getSelectedItem().toString();
                 String major = select_majors.getSelectedItem().toString();
                 ViewManagerActivity.getInstance().addNewStudent(Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major)));
-                student = null;
+                ViewManagerActivity.getInstance().changeToMainFragment();
             }
         });
         //bind listener for btn_cancel

@@ -3,6 +3,7 @@ package com.acetering.app;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +15,8 @@ import android.widget.TextView;
 import com.acetering.app.bean.User;
 import com.acetering.app.dao.FakeUserDAO;
 import com.acetering.app.dao.I_UserDAO;
+import com.acetering.app.event.OnProgressReachedListener;
+import com.acetering.app.views.TextCircleProgressBar;
 import com.acetering.student_input.R;
 
 
@@ -24,6 +27,7 @@ public class ActivityLogin extends AppCompatActivity {
     AlertDialog.Builder builder;
     AlertDialog pgDialog;
     AlertDialog wrongDialog;
+    AlertDialog adsDialog;
     static Handler handler;
 
     @Override
@@ -34,6 +38,7 @@ public class ActivityLogin extends AppCompatActivity {
         userDAO = new FakeUserDAO();
         builder = new AlertDialog.Builder(ActivityLogin.this);
         pgDialog = createLoginProgressDialog();
+        adsDialog = createAdsDialog();
         wrongDialog = createLoginWrongDialog();
         handler = new LoginHandler(this);
         bindView();
@@ -54,7 +59,7 @@ public class ActivityLogin extends AppCompatActivity {
                             //登录
                             User user = userDAO.login(input_id.getText().toString(), input_pwd.getText().toString());
                             //模拟休眠3秒
-                            sleep(100);
+                            sleep(1000);
                             pgDialog.cancel();
                             if (user != null) {//账户密码核验成功
                                 handler.sendEmptyMessage(0);
@@ -82,7 +87,47 @@ public class ActivityLogin extends AppCompatActivity {
         builder.setView(view_custom);
         //设置不可取消
         builder.setCancelable(false);
-        return builder.create();
+
+        pgDialog = builder.create();
+        return pgDialog;
+    }
+
+    private AlertDialog createAdsDialog() {
+        View v = LayoutInflater.from(this).inflate(R.layout.ads_view, null);
+        builder.setView(v);
+        builder.setTitle(null);
+        TextCircleProgressBar circleProgressBar = v.findViewById(R.id.pgBar);
+        //change to main activity after progress reached
+        circleProgressBar.setProgressReachedListener(new OnProgressReachedListener() {
+            @Override
+            public void onProgressReached() {
+                startActivity(new Intent(ActivityLogin.this, ViewManagerActivity.class));
+            }
+        });
+        //set click to skip ads
+        circleProgressBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                circleProgressBar.setProgress(circleProgressBar.getMax_progress());
+            }
+        });
+        //create ads dialog
+        adsDialog = builder.create();
+        //start progress when shown in view
+        adsDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            Thread thread = new Thread(circleProgressBar);
+
+            @Override
+            public void onShow(DialogInterface dialog) {
+                try {
+                    thread.start();
+                } catch (IllegalThreadStateException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        adsDialog.setCancelable(false);
+        return adsDialog;
     }
 
     private AlertDialog createLoginWrongDialog() {
@@ -95,6 +140,11 @@ public class ActivityLogin extends AppCompatActivity {
         //设置可以取消
         builder.setCancelable(true);
         return builder.create();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     private static class LoginHandler extends Handler {
@@ -111,7 +161,7 @@ public class ActivityLogin extends AppCompatActivity {
             context.pgDialog.cancel();
             switch (msg.what) {
                 case 0://登录成功
-                    context.startActivity(new Intent(context, ViewManagerActivity.class));
+                    context.adsDialog.show();
                     break;
                 case 1://账号不存在
                 case 2://账号和密码不匹配
