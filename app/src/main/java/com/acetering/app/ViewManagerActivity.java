@@ -33,6 +33,7 @@ public class ViewManagerActivity extends AppCompatActivity {
     private Date[] birthdays = new Date[]{new Date(), new Date()};
     private String[] colleagues = new String[]{"计算机学院", "电气学院"};
     private String[] majors = new String[]{"软件工程", "电气工程"};
+    private String TAG = "View Manager";
     ViewPager pager;
     MyFragmentAdapter adapter;
 
@@ -74,12 +75,13 @@ public class ViewManagerActivity extends AppCompatActivity {
         adapter = new MyFragmentAdapter(fManager, fragments);
         pager.setAdapter(adapter);
         changeToMainFragment();
-        Log.i("ViewManagerActivity", "onCreate: " + counter++);
+        Log.i(TAG, "---onCreate---");
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        Log.i(TAG, "---onCreateOptionsMenu---");
         return true;
     }
 
@@ -168,6 +170,37 @@ public class ViewManagerActivity extends AppCompatActivity {
         Student[] students = new Student[datas.size()];
         datas.toArray(students);
         outState.putSerializable("datas", students);
+        Log.i(TAG, "---onSaveInstanceState---");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i(TAG, "---onStart:---");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i(TAG, "---onStop:---");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "---onDestroy---");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(TAG, "---onPause:---");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(TAG, "---onResume---");
     }
 
     public void addNewStudent(Student student) {
