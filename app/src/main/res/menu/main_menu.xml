@@ -19,6 +19,9 @@
             <item
                 android:id="@+id/refresh_menu_item"
                 android:title="@string/refresh" />
+            <item
+                android:id="@+id/query_tel_info_item"
+                android:title="@string/tel_province" />
         </menu>
     </item>
 

@@ -3,20 +3,17 @@ package com.acetering.app;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
 import com.acetering.app.bean.User;
 import com.acetering.app.dao.FakeUserDAO;
 import com.acetering.app.dao.I_UserDAO;
-import com.acetering.app.event.OnProgressReachedListener;
-import com.acetering.app.views.TextCircleProgressBar;
+import com.acetering.app.views.DialogFactory;
 import com.acetering.student_input.R;
 
 
@@ -76,58 +73,15 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     private AlertDialog createLoginProgressDialog() {
-        //加载布局
-        final LayoutInflater inflater = ActivityLogin.this.getLayoutInflater();
-        View view_custom = inflater.inflate(R.layout.progressbar_dialog, null, false);
-        //设置标题
-        builder.setTitle("登陆中……");
-        //取消设置消息内容
-        builder.setMessage(null);
-        //设置布局
-        builder.setView(view_custom);
-        //设置不可取消
-        builder.setCancelable(false);
-        //create dialog
-        pgDialog = builder.create();
+        pgDialog = DialogFactory.createProgressDialog(this, "登陆中...");
         return pgDialog;
     }
 
     private AlertDialog createAdsDialog() {
-        View v = LayoutInflater.from(this).inflate(R.layout.ads_view, null);
-        builder.setView(v);
-        builder.setTitle(null);
-        TextCircleProgressBar circleProgressBar = v.findViewById(R.id.pgBar);
-        //change to main activity after progress reached
-        circleProgressBar.setProgressReachedListener(new OnProgressReachedListener() {
-            @Override
-            public void onProgressReached() {
-                startActivity(new Intent(ActivityLogin.this, ViewManagerActivity.class));
-                adsDialog.cancel();
-            }
-        });
-        //set click to skip ads
-        circleProgressBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                circleProgressBar.setProgress(circleProgressBar.getMax_progress());
-            }
-        });
-        //create ads dialog
-        adsDialog = builder.create();
-        //start progress when shown in view
-        adsDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            Thread thread = new Thread(circleProgressBar);
-
-            @Override
-            public void onShow(DialogInterface dialog) {
-                try {
-                    thread.start();
-                } catch (IllegalThreadStateException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        adsDialog.setCancelable(false);
+        DialogFactory.createAdsDialog(this, () -> {
+            startActivity(new Intent(ActivityLogin.this, ViewManagerActivity.class));
+            adsDialog.cancel();
+        }, null);
         return adsDialog;
     }
 
@@ -143,10 +97,6 @@ public class ActivityLogin extends AppCompatActivity {
         return builder.create();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 
     private static class LoginHandler extends Handler {
         ActivityLogin context;

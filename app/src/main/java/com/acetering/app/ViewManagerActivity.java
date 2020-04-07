@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +44,6 @@ public class ViewManagerActivity extends AppCompatActivity {
     FragmentStudent fragment_student;
     List<Student> datas;
     private AlertDialog searchDialog;
-    private int counter = 0;
 
 
     private void loadData(Bundle savedInstance) {
@@ -93,6 +93,9 @@ public class ViewManagerActivity extends AppCompatActivity {
                 break;
             case R.id.search_menu_item:
                 showSearchDialog();
+                break;
+            case R.id.query_tel_info_item:
+                startActivity(new Intent("com.acetering.student_input.QUERY_TEL_INFO"));
                 break;
         }
         return super.onOptionsItemSelected(item);

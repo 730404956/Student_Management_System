@@ -43,7 +43,7 @@ public class FragmentStudent extends Fragment {
     private RadioGroup select_sex;
     private AlertDialog dialog;
     private DatePickerDialog datePickerDialog;
-    private String TAG = "stu_input";
+    private String TAG = "fragment student";
     private Date birthday;
     private String[] colleague_names;
     private String[] major_default;

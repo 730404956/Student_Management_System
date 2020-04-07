@@ -38,7 +38,6 @@ public class FragmentMain extends Fragment {
     private AlertDialog.Builder builder;
     private AlertDialog itemMenuDialog, itemDeleteConfirmDialog;
     private Student current_student;
-    private int counter = 0;
 
     public FragmentMain() {
     }
@@ -53,7 +52,6 @@ public class FragmentMain extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.i("Activity Main", "onCreate: " + counter++);
         //get content view
         contentView = inflater.inflate(R.layout.activity_main, container, false);
         //create dialog builder
