@@ -36,12 +36,12 @@ public class ActivityPhonePlace extends AppCompatActivity {
         public void onSuccess(String responseString) {
             TelNumber telNumber = gson.fromJson(responseString, TelNumber.class);
             String province = telNumber.getProvince();
-            if (province == null) {
-                showErrorDialog("查询失败！请检查号码是否正确！");
-                return;
-            }
             if (waitForResult) {
                 pgDialog.cancel();
+                if (province == null) {
+                    showErrorDialog("查询失败！请检查号码是否正确！");
+                    return;
+                }
                 showSuccessDialog(telNumber);
             }
         }

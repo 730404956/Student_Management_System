@@ -78,7 +78,7 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     private AlertDialog createAdsDialog() {
-        DialogFactory.createAdsDialog(this, () -> {
+        adsDialog = DialogFactory.createAdsDialog(this, () -> {
             startActivity(new Intent(ActivityLogin.this, ViewManagerActivity.class));
             adsDialog.cancel();
         }, null);
