@@ -4,15 +4,19 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import com.acetering.app.bean.User;
 import com.acetering.app.dao.FakeUserDAO;
 import com.acetering.app.dao.I_UserDAO;
+import com.acetering.app.util.AppConfig;
 import com.acetering.app.views.DialogFactory;
 import com.acetering.student_input.R;
 
@@ -26,23 +30,36 @@ public class ActivityLogin extends AppCompatActivity {
     AlertDialog wrongDialog;
     AlertDialog adsDialog;
     static Handler handler;
+    String TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         setTitle(R.string.login);
-        userDAO = new FakeUserDAO();
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String id = sp.getString("account_id", "");
+        String password = sp.getString("account_password", "");
+        userDAO = FakeUserDAO.getInstance(getBaseContext());
         builder = new AlertDialog.Builder(ActivityLogin.this);
         pgDialog = createLoginProgressDialog();
-        adsDialog = createAdsDialog();
         wrongDialog = createLoginWrongDialog();
         handler = new LoginHandler(this);
         bindView();
+        input_id.setText(id);
+        input_pwd.setText(password);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AppConfig.applyConfig(this);
+        Log.i(TAG, "onStart: ");
     }
 
     private void bindView() {
         input_id = findViewById(R.id.login_id);
+
         input_pwd = findViewById(R.id.login_pwd);
         findViewById(R.id.btn_login).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,11 +94,16 @@ public class ActivityLogin extends AppCompatActivity {
         return pgDialog;
     }
 
-    private AlertDialog createAdsDialog() {
-        adsDialog = DialogFactory.createAdsDialog(this, () -> {
-            startActivity(new Intent(ActivityLogin.this, ViewManagerActivity.class));
-            adsDialog.cancel();
-        }, null);
+    private AlertDialog showAdsDialog() {
+        if (adsDialog == null) {
+            adsDialog = DialogFactory.createAdsDialog(this, () -> {
+                startActivity(new Intent(ActivityLogin.this, ViewManagerActivity.class));
+                adsDialog.cancel();
+            }, null);
+        } else {
+
+        }
+        adsDialog.show();
         return adsDialog;
     }
 
@@ -112,7 +134,7 @@ public class ActivityLogin extends AppCompatActivity {
             context.pgDialog.cancel();
             switch (msg.what) {
                 case 0://登录成功
-                    context.adsDialog.show();
+                    context.showAdsDialog();
                     break;
                 case 1://账号不存在
                 case 2://账号和密码不匹配

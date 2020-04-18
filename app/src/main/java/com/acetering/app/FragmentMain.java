@@ -66,6 +66,8 @@ public class FragmentMain extends Fragment {
         if (savedInstanceState != null) {
             filter_key_words = (String) savedInstanceState.get("filter_key_words");
         }
+        //reload filter result after back to front
+        adapter.getFilter(Student.class).filter(filter_key_words);
         //replace instance of view manager
         ViewManagerActivity.getInstance().replaceMainFragment(this);
         return contentView;
@@ -74,8 +76,6 @@ public class FragmentMain extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        //reload filter result after back to front
-        adapter.getFilter(Student.class).filter(filter_key_words);
     }
 
     /***

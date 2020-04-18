@@ -60,6 +60,7 @@ public class TextCircleProgressBar extends View implements Runnable {
         }
         if (progressReachedListener != null) {
             progressReachedListener.onProgressReached();
+            setProgress(0);
         }
     }
 

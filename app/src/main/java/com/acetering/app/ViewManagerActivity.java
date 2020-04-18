@@ -19,6 +19,7 @@ import android.widget.EditText;
 
 import com.acetering.app.adapter.MyFragmentAdapter;
 import com.acetering.app.bean.Student;
+import com.acetering.app.util.AppConfig;
 import com.acetering.student_input.R;
 
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class ViewManagerActivity extends AppCompatActivity {
     private static ViewManagerActivity instance;
     FragmentManager fManager;
     FragmentMain fragment_main;
+    ActivityConfig fragment_setting;
     FragmentStudent fragment_student;
     List<Student> datas;
     private AlertDialog searchDialog;
@@ -53,7 +55,7 @@ public class ViewManagerActivity extends AppCompatActivity {
             datas.addAll(Arrays.asList(students));
         } else {
             for (int i = 0; i < 2; i++) {
-                datas.add(new Student(stu_names[i], stu_ids[i], genders[i], birthdays[i], colleagues[i], majors[i]));
+                datas.add(new Student(stu_names[i], stu_ids[i], genders[i], birthdays[i], colleagues[i], majors[i], ""));
             }
         }
     }
@@ -62,16 +64,19 @@ public class ViewManagerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_manager);
+        AppConfig.applyConfig(this);
         //get fragment manager
         fManager = getSupportFragmentManager();
         fragment_main = new FragmentMain();
         fragment_student = new FragmentStudent();
+        fragment_setting = new ActivityConfig();
         instance = this;
         loadData(savedInstanceState);
         pager = findViewById(R.id.ly_content);
         List<Fragment> fragments = new ArrayList<>();
         fragments.add(fragment_student);
         fragments.add(fragment_main);
+        fragments.add(fragment_setting);
         adapter = new MyFragmentAdapter(fManager, fragments);
         pager.setAdapter(adapter);
         changeToMainFragment();

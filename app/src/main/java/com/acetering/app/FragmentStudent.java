@@ -5,10 +5,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +26,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.acetering.app.bean.Student;
+import com.acetering.app.util.FileUtil;
 import com.acetering.student_input.R;
 
 import java.text.SimpleDateFormat;
@@ -36,6 +42,7 @@ public class FragmentStudent extends Fragment {
     private EditText input_name;
     private Context context;
     private EditText input_stu_id;
+    private EditText input_description;
     private TextView input_stu_birthday;
     private Student student;
     private Spinner select_colleagues;
@@ -53,6 +60,7 @@ public class FragmentStudent extends Fragment {
 
     //use for debug
     private int counter = 0;
+
 
     public FragmentStudent() {
     }
@@ -93,7 +101,8 @@ public class FragmentStudent extends Fragment {
         String sex = String.valueOf(((RadioButton) contentView.findViewById(select_sex.getCheckedRadioButtonId())).getText());
         String colleague = select_colleagues.getSelectedItem().toString();
         String major = select_majors.getSelectedItem().toString();
-        Student student_instance = Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major));
+        String description = input_description.getText().toString();
+        Student student_instance = Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major, description));
         student = student_instance;
         super.onPause();
     }
@@ -102,7 +111,6 @@ public class FragmentStudent extends Fragment {
         this.student = student;
         if (select_majors != null)
             initData(student);
-
     }
 
     private void showDatePicker() {
@@ -161,6 +169,7 @@ public class FragmentStudent extends Fragment {
                     break;
                 }
             }
+            input_description.setText(student.getDescription());
         }
     }
 
@@ -170,6 +179,27 @@ public class FragmentStudent extends Fragment {
         input_stu_birthday.setText(getText(R.string.please_choose));
         birthday = null;
         select_colleagues.setSelection(0);
+        input_description.setText("");
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case FileUtil.FILE_SELECT_CODE:
+                if (resultCode == Activity.RESULT_OK) {
+                    //get file path
+                    String path = Uri.decode(data.getDataString()).substring(Uri.decode(data.getDataString()).indexOf("raw:") + 4);
+                    //read file
+                    String content = FileUtil.ReadTxtFile(path);
+                    if (student == null) {
+                        student = new Student();
+                    }
+                    student.setDescription(content);
+                    Toast.makeText(context, "导入信息成功！", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void bindView() {
@@ -179,6 +209,10 @@ public class FragmentStudent extends Fragment {
         input_stu_birthday = contentView.findViewById(R.id.input_stu_birthday);
         select_colleagues = contentView.findViewById(R.id.select_colleague);
         select_majors = contentView.findViewById(R.id.select_major);
+        input_description = contentView.findViewById(R.id.description);
+        contentView.findViewById(R.id.load_data).setOnClickListener(v -> {
+            startActivityForResult(FileUtil.getInstance(context).getFileChooserIntent(), FileUtil.FILE_SELECT_CODE);
+        });
         Button btn_confirm = contentView.findViewById(R.id.btn_confirm);
         Button btn_cancel = contentView.findViewById(R.id.btn_cancel);
         if (dialog == null) {
@@ -277,7 +311,8 @@ public class FragmentStudent extends Fragment {
                 String sex = String.valueOf(((RadioButton) contentView.findViewById(select_sex.getCheckedRadioButtonId())).getText());
                 String colleague = select_colleagues.getSelectedItem().toString();
                 String major = select_majors.getSelectedItem().toString();
-                ViewManagerActivity.getInstance().addNewStudent(Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major)));
+                String description = input_description.getText().toString();
+                ViewManagerActivity.getInstance().addNewStudent(Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major, description)));
                 ViewManagerActivity.getInstance().changeToMainFragment();
             }
         });
@@ -293,5 +328,6 @@ public class FragmentStudent extends Fragment {
             }
         });
     }
+
 
 }

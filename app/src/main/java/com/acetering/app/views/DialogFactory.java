@@ -57,10 +57,9 @@ public class DialogFactory {
         adsDialog = builder.create();
         //start progress when shown in view
         adsDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            Thread thread = new Thread(circleProgressBar);
-
             @Override
             public void onShow(DialogInterface dialog) {
+                Thread thread = new Thread(circleProgressBar);
                 try {
                     thread.start();
                 } catch (IllegalThreadStateException e) {

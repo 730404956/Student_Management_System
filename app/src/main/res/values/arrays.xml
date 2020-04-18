@@ -20,4 +20,15 @@
         <item>电气工程</item>
         <item>电机工程</item>
     </string-array>
+    <!--   settings font_size -->
+    <string-array name="font_size">
+        <item>小</item>
+        <item>中</item>
+        <item>大</item>
+    </string-array>
+    <string-array name="font_size_value">
+        <item>0.8f</item>
+        <item>1.0f</item>
+        <item>1.5f</item>
+    </string-array>
 </resources>

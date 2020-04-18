@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class FiltableAdapter<T extends IFiltableData> extends BasicAdapter<T> implements Filterable {
+    private String TAG = "FiltableAdapter";
     protected List<T> data;
     protected Filter mfilter;
     protected CallbackEvent onResult, onDataSetInvalid;
@@ -101,9 +102,9 @@ public abstract class FiltableAdapter<T extends IFiltableData> extends BasicAdap
 
         public MyFilter(Class cls) {
             try {
-                getData = cls.getMethod("getFiltData", null);
+                getData = cls.getMethod("getFiltData");
             } catch (NoSuchMethodException e) {
-                Log.e("Filter init error", "MyFilter: class doesn't have method getFiltData");
+                Log.e(TAG, "MyFilter: class doesn't have method getFiltData");
             }
         }
 
@@ -141,13 +142,13 @@ public abstract class FiltableAdapter<T extends IFiltableData> extends BasicAdap
         @Override
         protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
             data = (List<T>) filterResults.values;
-            Log.i("", "publishResults:" + filterResults.count);
+            Log.i(TAG, "publishResults:" + filterResults.count);
             if (filterResults.count > 0) {
                 notifyDataSetChanged();//通知数据发生了改变
-                Log.i("", "publishResults:notifyDataSetChanged");
+                Log.i(TAG, "publishResults:notifyDataSetChanged");
             } else {
                 notifyDataSetInvalidated();//通知数据失效
-                Log.i("", "publishResults:notifyDataSetInvalidated");
+                Log.i(TAG, "publishResults:notifyDataSetInvalidated");
             }
         }
     }

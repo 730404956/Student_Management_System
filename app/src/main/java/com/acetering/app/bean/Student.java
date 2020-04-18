@@ -18,14 +18,16 @@ public class Student implements Serializable, IFiltableData {
     private String colleague;
     private String major;
     private Date birthday;
+    private String description;
 
-    public Student(String stu_name, String stu_id, String gender, Date birthday, String colleague, String major) {
+    public Student(String stu_name, String stu_id, String gender, Date birthday, String colleague, String major, String description) {
         this.stu_name = stu_name;
         this.stu_id = stu_id;
         this.gender = gender;
         this.birthday = birthday;
         this.colleague = colleague;
         this.major = major;
+        this.description = description;
 
     }
 
@@ -86,6 +88,25 @@ public class Student implements Serializable, IFiltableData {
         }
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Student() {
+        this.stu_name = "";
+        this.stu_id = "";
+        this.gender = "";
+        this.birthday = null;
+        this.colleague = "";
+        this.major = "";
+        this.description = "";
+
+    }
+
     public static Student copy(Student a, Student student) {
         if (a == null) {
             return student;
@@ -95,6 +116,7 @@ public class Student implements Serializable, IFiltableData {
         a.gender = student.gender;
         a.colleague = student.colleague;
         a.major = student.major;
+        a.description = student.description;
         if (student.birthday == null) {
             a.birthday = null;
         } else {
@@ -107,8 +129,8 @@ public class Student implements Serializable, IFiltableData {
     @Override
     public String toString() {
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
-        return String.format("姓名：%s\n性别：%s\n生日：%s\n学号：%s\n学院：%s\n班级：%s\n您要做什么？",
-                this.getStu_name(), this.getGender(), sf.format(this.getBirthday()), this.getStu_id(), this.getColleague(), this.getMajor());
+        return String.format("姓名：%s\n性别：%s\n生日：%s\n学号：%s\n学院：%s\n班级：%s\n好友简介：%s\n您要做什么？",
+                this.getStu_name(), this.getGender(), sf.format(this.getBirthday()), this.getStu_id(), this.getColleague(), this.getMajor(), this.getDescription());
     }
 
     @Override
@@ -121,6 +143,7 @@ public class Student implements Serializable, IFiltableData {
         result.put("gender", gender);
         result.put("colleague", colleague);
         result.put("major", major);
+        result.put("description", description);
         return result;
     }
 }

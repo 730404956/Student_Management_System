@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.acetering.app.bean.TelNumber;
+import com.acetering.app.util.AppConfig;
 import com.acetering.app.util.HttpUtil;
 import com.acetering.app.util.TelInfoQuery;
 import com.acetering.app.views.DialogFactory;
@@ -59,6 +60,13 @@ public class ActivityPhonePlace extends AppCompatActivity {
         response = new TelResponse();
         query = new TelInfoQuery(response);
         bindView();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        AppConfig.applyConfig(this);
     }
 
     private void bindView() {

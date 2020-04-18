@@ -15,6 +15,7 @@
     <string name="label_stu_colleague">学院</string>
     <string name="label_stu_major">专业</string>
     <string name="label_stu_birthday">生日</string>
+    <string name="description">好友简介</string>
 
     <!--UI info-->
     <string name="please_choose">请选择</string>
@@ -31,10 +32,13 @@
     <string name="user_pwd">密码</string>
     <string name="add">添加</string>
     <string name="menu">菜单</string>
+    <string name="load_data">导入信息</string>
     <string name="refresh">刷新</string>
     <string name="search">搜索</string>
     <string name="edit">编辑</string>
     <string name="remove">删除</string>
     <string name="now_loading">正在处理……</string>
+    <string name="title_activity_config">Settings</string>
+
 
 </resources>
