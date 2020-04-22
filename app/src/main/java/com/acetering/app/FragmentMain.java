@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -78,6 +79,7 @@ public class FragmentMain extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        ((Activity) context).setTitle(R.string.app_name);
     }
 
     /***

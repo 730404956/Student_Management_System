@@ -1,5 +1,6 @@
 package com.acetering.app;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import com.acetering.app.util.AppConfig;
@@ -14,6 +15,12 @@ public class ActivityConfig extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.root_preferences);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((Activity) getContext()).setTitle(R.string.title_activity_config);
     }
 
     @Override

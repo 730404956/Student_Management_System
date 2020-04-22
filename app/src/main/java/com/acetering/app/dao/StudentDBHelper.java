@@ -19,13 +19,13 @@ public class StudentDBHelper extends SQLiteOpenHelper {
     }
 
     public static String getCreateTableSQL() {
-        return "create table student_info(id varchar(20) primary key,name varchar(40),gender varchar(10),colleague text,major text,birthday date)";
+        return "create table student_info(id varchar(20) primary key,name varchar(40),gender varchar(10),colleague text,major text,birthday date,description text)";
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(getCreateTableSQL());
-        db.execSQL("insert into student_info values('3170208999','Jobs','男','计算机学院','计算机科学','2020-04-22');");
+        db.execSQL("insert into student_info values('3170208999','Jobs','男','计算机学院','计算机科学','2020-04-22','');");
         Log.i(TAG, "onCreate: ");
     }
 

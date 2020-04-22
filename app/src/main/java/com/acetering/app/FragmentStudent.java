@@ -30,6 +30,7 @@ import android.widget.Toast;
 
 import com.acetering.app.bean.Student;
 import com.acetering.app.util.FileUtil;
+import com.acetering.app.util.PermissionUtil;
 import com.acetering.student_input.R;
 
 import java.text.SimpleDateFormat;
@@ -93,6 +94,14 @@ public class FragmentStudent extends Fragment {
         super.onResume();
     }
 
+    private void setTitle() {
+        if (student != null && student.getStu_name().length() > 0) {
+            ((Activity) context).setTitle(getString(R.string.edit) + student.getStu_name());
+        } else {
+            ((Activity) context).setTitle(R.string.app_name);
+        }
+    }
+
     @Override
     public void onPause() {
         Log.i(TAG, "onPause: ");
@@ -147,6 +156,7 @@ public class FragmentStudent extends Fragment {
     }
 
     private void initData(Student student) {
+        setTitle();
         if (student == null) {
             clearData();
         } else {
@@ -212,7 +222,12 @@ public class FragmentStudent extends Fragment {
         select_majors = contentView.findViewById(R.id.select_major);
         input_description = contentView.findViewById(R.id.description);
         contentView.findViewById(R.id.load_data).setOnClickListener(v -> {
-            startActivityForResult(FileUtil.getInstance(context).getFileChooserIntent(), FileUtil.FILE_SELECT_CODE);
+            PermissionUtil util = PermissionUtil.getInstance(context);
+            if (util.checkReadPermission()) {
+                startActivityForResult(FileUtil.getInstance(context).getFileChooserIntent(), FileUtil.FILE_SELECT_CODE);
+            } else {
+                util.getReadPermission();
+            }
         });
         Button btn_confirm = contentView.findViewById(R.id.btn_confirm);
         Button btn_cancel = contentView.findViewById(R.id.btn_cancel);

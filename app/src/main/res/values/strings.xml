@@ -38,7 +38,7 @@
     <string name="edit">编辑</string>
     <string name="remove">删除</string>
     <string name="now_loading">正在处理……</string>
-    <string name="title_activity_config">Settings</string>
+    <string name="title_activity_config">用户设置</string>
 
 
 </resources>
