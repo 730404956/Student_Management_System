@@ -195,6 +195,7 @@ public class FragmentStudent extends Fragment {
                         student = new Student();
                     }
                     student.setDescription(content);
+                    Log.i(TAG, "onActivityResult: " + content);
                     Toast.makeText(context, "导入信息成功！", Toast.LENGTH_SHORT).show();
                 }
                 break;

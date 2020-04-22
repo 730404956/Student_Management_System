@@ -20,7 +20,7 @@ import java.util.List;
 public class StudentDAL implements StudentDAO {
     SQLiteDatabase db;
     String TAG = "DB";
-    public final static int db_version = 1;
+    public final static int db_version = 2;
 
     public StudentDAL(Context context) {
         StudentDBHelper helper = new StudentDBHelper(context, "student_db", null, db_version);
@@ -30,8 +30,7 @@ public class StudentDAL implements StudentDAO {
     @Override
     public boolean addStudent(Student student) {
         try {
-            db.execSQL("insert into student_info values(?,?,?,?,?,?)", new String[]{student.getStu_id(), student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday())});
-//            db.execSQL("insert into student_info values(?,?,?,?,?,?,?)", new String[]{student.getStu_id(), student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription()});
+            db.execSQL("insert into student_info values(?,?,?,?,?,?,?)", new String[]{student.getStu_id(), student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription()});
 
             Log.i(TAG, "addStudent: " + student.getStu_name());
         } catch (SQLException e) {
@@ -56,8 +55,7 @@ public class StudentDAL implements StudentDAO {
     @Override
     public boolean changeStudentInfo(Student student) {
         try {
-            db.execSQL("update student_info set name=? ,gender=?,colleague=?,major=?,birthday=?  where id=?;", new String[]{student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getStu_id()});
-//            db.execSQL("update student_info set name=? ,gender=?,colleague=?,major=?,birthday=?,description=?  where id=?;", new String[]{student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription(), student.getStu_id()});
+            db.execSQL("update student_info set name=? ,gender=?,colleague=?,major=?,birthday=?,description=?  where id=?;", new String[]{student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription(), student.getStu_id()});
 
             Log.i(TAG, "changeStudentInfo: " + student.getStu_name());
         } catch (SQLException e) {
@@ -95,7 +93,7 @@ public class StudentDAL implements StudentDAO {
             String stu_colleague = cursor.getString(3);
             String stu_major = cursor.getString(4);
             Date birthday = Date.valueOf(cursor.getString(5));
-            String stu_description = "";//cursor.getString(6);
+            String stu_description = cursor.getString(6);
             Student s = new Student(stu_name, stu_id, stu_gender, birthday, stu_colleague, stu_major, stu_description);
             students.add(s);
         } while (cursor.moveToNext());
