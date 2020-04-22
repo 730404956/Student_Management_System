@@ -44,20 +44,22 @@ public class ViewManagerActivity extends AppCompatActivity {
     FragmentMain fragment_main;
     ActivityConfig fragment_setting;
     FragmentStudent fragment_student;
-    List<Student> datas;
+    //    List<Student> datas;
     private AlertDialog searchDialog;
 
 
     private void loadData(Bundle savedInstance) {
-        datas = new ArrayList<>();
-        if (savedInstance != null) {
-            Student[] students = (Student[]) (savedInstance.get("datas"));
-            datas.addAll(Arrays.asList(students));
-        } else {
-            for (int i = 0; i < 2; i++) {
-                datas.add(new Student(stu_names[i], stu_ids[i], genders[i], birthdays[i], colleagues[i], majors[i], ""));
-            }
-        }
+//        if (savedInstance != null) {
+//            Student[] students = (Student[]) (savedInstance.get("datas"));
+//            datas = new ArrayList<>();
+//            datas.addAll(Arrays.asList(students));
+//        } else {
+//            for (int i = 0; i < 2; i++) {
+//                datas.add(new Student(stu_names[i], stu_ids[i], genders[i], birthdays[i], colleagues[i], majors[i], ""));
+//            }
+//            StudentDAL dal=new StudentDAL(this);
+//            datas.addAll(dal.getAllStudents());
+//        }
     }
 
     @Override
@@ -175,10 +177,10 @@ public class ViewManagerActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Student[] students = new Student[datas.size()];
-        datas.toArray(students);
-        outState.putSerializable("datas", students);
-        Log.i(TAG, "---onSaveInstanceState---");
+//        Student[] students = new Student[datas.size()];
+//        datas.toArray(students);
+//        outState.putSerializable("datas", students);
+//        Log.i(TAG, "---onSaveInstanceState---");
     }
 
     @Override

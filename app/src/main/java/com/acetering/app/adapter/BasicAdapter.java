@@ -17,12 +17,14 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public abstract class BasicAdapter<T> extends BaseAdapter {
+public class BasicAdapter<T> extends BaseAdapter {
     protected List<T> dataResource;
     protected int itemLayoutResourceId;
     protected Context context;
+    protected ViewBinder<T> binder;
 
-    public BasicAdapter(Context context, List<T> dataResource, int itemLayoutResourceId) {
+    public BasicAdapter(Context context, List<T> dataResource, int itemLayoutResourceId, ViewBinder<T> binder) {
+        this.binder = binder;
         this.context = context;
         this.dataResource = dataResource;
         this.itemLayoutResourceId = itemLayoutResourceId;
@@ -46,7 +48,7 @@ public abstract class BasicAdapter<T> extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = ViewHolder.bindLayout(context, convertView, parent, itemLayoutResourceId, position);
-        bindView(holder, getItem(position));
+        binder.bindView(holder, getItem(position));
         return holder.getView();
     }
 
@@ -57,8 +59,7 @@ public abstract class BasicAdapter<T> extends BaseAdapter {
     public boolean addOrModify(T item) {
         int index = dataResource.indexOf(item);
         if (index >= 0) {
-            dataResource.set(index, item);
-            notifyDataSetChanged();
+            modifyItem(index, item);
             return false;
         } else {
             addItem(item);
@@ -66,6 +67,10 @@ public abstract class BasicAdapter<T> extends BaseAdapter {
         }
     }
 
+    public void modifyItem(int index, T item) {
+        dataResource.set(index, item);
+        notifyDataSetChanged();
+    }
     public void addItem(T item) {
         dataResource.add(item);
         notifyDataSetChanged();
@@ -76,15 +81,27 @@ public abstract class BasicAdapter<T> extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public List<T> getDataResource() {
+        return dataResource;
+    }
+
+    /**
+     * remember to call this before exit app
+     */
+    public void close() {
+        //do some release job
+    }
     /**
      * bind data and view, use holder.setXXX
      */
-    protected abstract void bindView(ViewHolder holder, T item);
+    public interface ViewBinder<T> {
+        void bindView(ViewHolder holder, T item);
+    }
 
     /**
      * A class to store inner views of view item, with this all inner views will only be load once;
      */
-    protected static class ViewHolder {
+    public static class ViewHolder {
         //Activity context, use for get resources
         private Context context;
         //itemView's inner views

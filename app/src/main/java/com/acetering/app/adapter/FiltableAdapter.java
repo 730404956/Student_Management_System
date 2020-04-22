@@ -19,14 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public abstract class FiltableAdapter<T extends IFiltableData> extends BasicAdapter<T> implements Filterable {
+public class FiltableAdapter<T extends IFiltableData> extends BasicAdapter<T> implements Filterable {
     private String TAG = "FiltableAdapter";
     protected List<T> data;
     protected Filter mfilter;
     protected CallbackEvent onResult, onDataSetInvalid;
 
-    public FiltableAdapter(Context context, List<T> dataResource, int itemLayoutResourceId) {
-        super(context, dataResource, itemLayoutResourceId);
+    public FiltableAdapter(Context context, List<T> dataResource, int itemLayoutResourceId, ViewBinder<T> binder) {
+        super(context, dataResource, itemLayoutResourceId, binder);
         data = dataResource;
     }
 

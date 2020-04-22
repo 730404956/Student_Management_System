@@ -17,6 +17,8 @@ import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.acetering.app.adapter.BasicAdapter;
+import com.acetering.app.adapter.SQLiteFiltableAdapter;
 import com.acetering.app.views.ImageToast;
 import com.acetering.app.adapter.FiltableAdapter;
 import com.acetering.app.bean.Student;
@@ -88,9 +90,9 @@ public class FragmentMain extends Fragment {
         //get list view from xml
         stu_list = contentView.findViewById(R.id.stu_list);
         //显示适配器视图绑定配置
-        adapter = new FiltableAdapter<Student>(context, ViewManagerActivity.getInstance().datas, R.layout.student_info_item) {
+        adapter = new SQLiteFiltableAdapter(context, null, R.layout.student_info_item, new BasicAdapter.ViewBinder<Student>() {
             @Override
-            protected void bindView(ViewHolder holder, Student item) {
+            public void bindView(BasicAdapter.ViewHolder holder, Student item) {
                 String sex_male = getString(R.string.sex_male);
                 holder.setText(R.id.stu_name, item.getStu_name())
                         .setText(R.id.stu_id, item.getStu_id())
@@ -99,7 +101,7 @@ public class FragmentMain extends Fragment {
                         .setImage(R.id.gender_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.male : R.drawable.female))
                         .setImage(R.id.stu_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.jobs : R.drawable.lena));
             }
-        };
+        });
         //set message when filter result of nothing
         adapter.setOnDataSetInvalid(new CallbackEvent() {
             @Override
@@ -216,6 +218,12 @@ public class FragmentMain extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putSerializable("filter_key_words", filter_key_words);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.close();
     }
 
     public void clearFilter() {
