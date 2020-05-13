@@ -22,6 +22,9 @@
             <item
                 android:id="@+id/query_tel_info_item"
                 android:title="@string/tel_province" />
+            <item
+                android:id="@+id/query_weekday_item"
+                android:title="日期" />
         </menu>
     </item>
 

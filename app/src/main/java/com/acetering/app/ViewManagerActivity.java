@@ -19,7 +19,11 @@ import android.widget.EditText;
 
 import com.acetering.app.adapter.MyFragmentAdapter;
 import com.acetering.app.bean.Student;
+import com.acetering.app.service.IDayOfWeekConnection;
+import com.acetering.app.service.NetworkObserver;
+import com.acetering.app.service.QueryWeekdayService;
 import com.acetering.app.util.AppConfig;
+import com.acetering.app.views.DialogFactory;
 import com.acetering.student_input.R;
 
 import java.util.ArrayList;
@@ -46,6 +50,10 @@ public class ViewManagerActivity extends AppCompatActivity {
     FragmentStudent fragment_student;
     //    List<Student> datas;
     private AlertDialog searchDialog;
+
+    private Intent net_obeserver;
+    private IDayOfWeekConnection conn;
+    private AlertDialog query_weekday_dialog;
 
 
     private void loadData(Bundle savedInstance) {
@@ -82,6 +90,11 @@ public class ViewManagerActivity extends AppCompatActivity {
         adapter = new MyFragmentAdapter(fManager, fragments);
         pager.setAdapter(adapter);
         changeToMainFragment();
+        net_obeserver = new Intent(this, NetworkObserver.class);
+        startService(net_obeserver);
+        Intent intent = new Intent(this, QueryWeekdayService.class);
+        conn = new IDayOfWeekConnection();
+        bindService(intent, conn, BIND_AUTO_CREATE);
         Log.i(TAG, "---onCreate---");
     }
 
@@ -104,6 +117,10 @@ public class ViewManagerActivity extends AppCompatActivity {
             case R.id.query_tel_info_item:
                 startActivity(new Intent("com.acetering.student_input.QUERY_TEL_INFO"));
                 break;
+            case R.id.query_weekday_item:
+                if (query_weekday_dialog == null)
+                    query_weekday_dialog = DialogFactory.createQueryWeekdayDialog(this, conn.getiDayOfWeek());
+                query_weekday_dialog.show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -198,6 +215,7 @@ public class ViewManagerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopService(net_obeserver);
         Log.i(TAG, "---onDestroy---");
     }
 

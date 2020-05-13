@@ -10,6 +10,8 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -22,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -31,6 +34,7 @@ import android.widget.Toast;
 import com.acetering.app.bean.Student;
 import com.acetering.app.util.FileUtil;
 import com.acetering.app.util.PermissionUtil;
+import com.acetering.app.views.ImagePickerDialog;
 import com.acetering.student_input.R;
 
 import java.text.SimpleDateFormat;
@@ -45,6 +49,7 @@ public class FragmentStudent extends Fragment {
     private EditText input_stu_id;
     private EditText input_description;
     private TextView input_stu_birthday;
+    private ImageView img;
     private Student student;
     private Spinner select_colleagues;
     private Spinner select_majors;
@@ -57,7 +62,9 @@ public class FragmentStudent extends Fragment {
     private String[] major_default;
     private String[] major_cs;
     private String[] major_e;
+    private ImagePickerDialog imagePickerDialog;
     private ArrayAdapter<String> simple_major_adapter;
+    private Bitmap image;
 
     //use for debug
     private int counter = 0;
@@ -221,6 +228,21 @@ public class FragmentStudent extends Fragment {
         select_colleagues = contentView.findViewById(R.id.select_colleague);
         select_majors = contentView.findViewById(R.id.select_major);
         input_description = contentView.findViewById(R.id.description);
+        img = contentView.findViewById(R.id.choose_img);
+        img.setOnClickListener(v -> {
+            if (imagePickerDialog == null) {
+                ImagePickerDialog.Builder builder = new ImagePickerDialog.Builder(context);
+                builder.setPositiveButton(getString(R.string.confirm), v1 -> {
+                    if (builder.mDialog.getChoosen_img() != null) {
+                        BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), builder.mDialog.getChoosen_img());
+                        img.setImageDrawable(bitmapDrawable);
+                        image = builder.mDialog.getChoosen_img();
+                    }
+                });
+                imagePickerDialog = builder.create();
+            }
+            imagePickerDialog.show();
+        });
         contentView.findViewById(R.id.load_data).setOnClickListener(v -> {
             PermissionUtil util = PermissionUtil.getInstance(context);
             if (util.checkReadPermission()) {
@@ -328,7 +350,9 @@ public class FragmentStudent extends Fragment {
                 String colleague = select_colleagues.getSelectedItem().toString();
                 String major = select_majors.getSelectedItem().toString();
                 String description = input_description.getText().toString();
-                ViewManagerActivity.getInstance().addNewStudent(Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major, description)));
+                Student r_student = new Student(name, stu_id, sex, birthday, colleague, major, description);
+                r_student.setImage(image);
+                ViewManagerActivity.getInstance().addNewStudent(Student.copy(student, r_student));
                 ViewManagerActivity.getInstance().changeToMainFragment();
             }
         });

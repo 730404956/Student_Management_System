@@ -6,6 +6,7 @@ package com.acetering.app.adapter;
  */
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -144,6 +145,9 @@ public class BasicAdapter<T> extends BaseAdapter {
             return view;
         }
 
+        /**
+         * set onclick listener for item;
+         */
         public ViewHolder setOnClickListener(View.OnClickListener listener) {
             itemView.setOnClickListener(listener);
             return this;
@@ -173,6 +177,11 @@ public class BasicAdapter<T> extends BaseAdapter {
             if (view instanceof ImageView) {
                 ((ImageView) view).setImageDrawable(drawable);
             }
+            return this;
+        }
+
+        public ViewHolder setBackground(int color) {
+            itemView.setBackgroundColor(color);
             return this;
         }
     }

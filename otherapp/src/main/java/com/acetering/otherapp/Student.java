@@ -1,8 +1,6 @@
-package com.acetering.app.bean;
+package com.acetering.otherapp;
 
 import android.graphics.Bitmap;
-
-import com.acetering.app.adapter.IFiltableData;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;

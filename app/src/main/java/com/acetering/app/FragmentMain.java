@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -100,8 +101,14 @@ public class FragmentMain extends Fragment {
                         .setText(R.id.stu_id, item.getStu_id())
                         .setText(R.id.stu_colleague, item.getColleague())
                         .setText(R.id.stu_major, item.getMajor())
-                        .setImage(R.id.gender_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.male : R.drawable.female))
-                        .setImage(R.id.stu_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.jobs : R.drawable.lena));
+                        .setImage(R.id.gender_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.male : R.drawable.female));
+                if (item.getImage() == null) {
+                    holder.setImage(R.id.stu_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.jobs : R.drawable.lena));
+                } else {
+                    BitmapDrawable drawable = new BitmapDrawable(getResources(), item.getImage());
+                    holder.setImage(R.id.stu_img, drawable);
+                }
+
             }
         });
         //set message when filter result of nothing

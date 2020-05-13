@@ -4,11 +4,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.RemoteException;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.acetering.app.ActivityLogin;
+import com.acetering.app.IDayOfWeek;
 import com.acetering.app.ViewManagerActivity;
 import com.acetering.app.event.OnProgressReachedListener;
 import com.acetering.student_input.R;
@@ -69,5 +75,31 @@ public class DialogFactory {
         });
         adsDialog.setCancelable(false);
         return adsDialog;
+    }
+
+    public static AlertDialog createQueryWeekdayDialog(Context context, IDayOfWeek iDayOfWeek) {
+        AlertDialog dialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View v = LayoutInflater.from(context).inflate(R.layout.query_weekday, null);
+        builder.setView(v);
+        Button btn_confirm = v.findViewById(R.id.btn_confirm);
+        final EditText year = v.findViewById(R.id.year);
+        final EditText month = v.findViewById(R.id.month);
+        final EditText day = v.findViewById(R.id.day);
+
+        btn_confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int day_of_week = -1;
+                try {
+                    day_of_week = iDayOfWeek.getWeekday(Integer.parseInt(year.getText().toString()), Integer.parseInt(month.getText().toString()) - 1, Integer.parseInt(day.getText().toString()));
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(context, "星期" + new String[]{"日", "一", "二", "三", "四", "五", "六"}[day_of_week - 1], Toast.LENGTH_SHORT).show();
+            }
+        });
+        dialog = builder.create();
+        return dialog;
     }
 }

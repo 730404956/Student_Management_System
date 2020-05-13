@@ -4,10 +4,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.acetering.app.bean.Student;
 
+import java.io.ByteArrayOutputStream;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,7 +23,7 @@ import java.util.List;
 public class StudentDAL implements StudentDAO {
     SQLiteDatabase db;
     String TAG = "DB";
-    public final static int db_version = 2;
+    public final static int db_version = 3;
 
     public StudentDAL(Context context) {
         StudentDBHelper helper = new StudentDBHelper(context, "student_db", null, db_version);
@@ -29,13 +32,18 @@ public class StudentDAL implements StudentDAO {
 
     @Override
     public boolean addStudent(Student student) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
         try {
-            db.execSQL("insert into student_info values(?,?,?,?,?,?,?)", new String[]{student.getStu_id(), student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription()});
-
+            if (student.getImage() != null) {
+                student.getImage().compress(Bitmap.CompressFormat.PNG, 100, stream);
+            }
+            db.execSQL("insert into student_info values(?,?,?,?,?,?,?,?)", new Object[]{student.getStu_id(), student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription(), stream.toByteArray()});
             Log.i(TAG, "addStudent: " + student.getStu_name());
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+
         }
         return true;
     }
@@ -55,7 +63,9 @@ public class StudentDAL implements StudentDAO {
     @Override
     public boolean changeStudentInfo(Student student) {
         try {
-            db.execSQL("update student_info set name=? ,gender=?,colleague=?,major=?,birthday=?,description=?  where id=?;", new String[]{student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription(), student.getStu_id()});
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            student.getImage().compress(Bitmap.CompressFormat.PNG, 100, stream);
+            db.execSQL("update student_info set name=? ,gender=?,colleague=?,major=?,birthday=?,description=?,img=?  where id=?;", new Object[]{student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription(), stream.toByteArray(), student.getStu_id()});
 
             Log.i(TAG, "changeStudentInfo: " + student.getStu_name());
         } catch (SQLException e) {
@@ -95,6 +105,14 @@ public class StudentDAL implements StudentDAO {
             Date birthday = Date.valueOf(cursor.getString(5));
             String stu_description = cursor.getString(6);
             Student s = new Student(stu_name, stu_id, stu_gender, birthday, stu_colleague, stu_major, stu_description);
+            Bitmap img = null;
+            try {
+                byte[] img_bytes = cursor.getBlob(7);
+                img = BitmapFactory.decodeByteArray(img_bytes, 0, img_bytes.length);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            s.setImage(img);
             students.add(s);
         } while (cursor.moveToNext());
         cursor.close();

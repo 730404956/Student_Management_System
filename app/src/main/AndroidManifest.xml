@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic"
@@ -11,9 +13,27 @@
         android:roundIcon="@mipmap/ic"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service
+            android:name="com.acetering.app.service.QueryWeekdayService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.acetering.student_input.QueryWeekdayService" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="com.acetering.app.service.NetworkObserver"
+            android:enabled="true"
+            android:exported="true" />
+
+        <provider
+            android:name="com.acetering.app.share.StudentContentProvider"
+            android:authorities="com.acetering.app.providers.student"
+            android:exported="true" />
+
         <activity
             android:name="com.acetering.app.ActivityConfig"
-            android:label="@string/title_activity_config"></activity>
+            android:label="@string/title_activity_config" />
         <activity android:name="com.acetering.app.ActivityPhonePlace">
             <intent-filter>
                 <action android:name="com.acetering.student_input.QUERY_TEL_INFO" />
@@ -21,9 +41,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name="com.acetering.app.ViewManagerActivity">
-
-        </activity>
+        <activity android:name="com.acetering.app.ViewManagerActivity" />
         <activity android:name="com.acetering.app.ActivityLogin">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

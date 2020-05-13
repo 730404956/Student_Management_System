@@ -7,6 +7,7 @@
     <string name="tel_province">归属地</string>
     <string name="tel_host">运营商</string>
     <!--Student attributes-->
+    <string name="label_stu_img">头像</string>
     <string name="label_stu_name">姓名</string>
     <string name="label_stu_id">学号</string>
     <string name="label_stu_sex">性别</string>

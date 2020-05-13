@@ -35,6 +35,8 @@ public class StudentDBHelper extends SQLiteOpenHelper {
         switch (newVersion) {
             case 2:
                 db.execSQL("alter table student_info add column description text");
+            case 3:
+                db.execSQL("alter table student_info add column img blob");
         }
     }
 }
