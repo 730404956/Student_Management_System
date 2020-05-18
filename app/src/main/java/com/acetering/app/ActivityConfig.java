@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.acetering.app.util.AppConfig;
-import com.acetering.student_input.R;
 
 import androidx.preference.PreferenceFragmentCompat;
 

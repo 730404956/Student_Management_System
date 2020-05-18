@@ -7,7 +7,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.acetering.student_input.R;
+import com.acetering.app.R;
+
 
 public class ImageToast extends Toast {
     protected static ImageToast toast;

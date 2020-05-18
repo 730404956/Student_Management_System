@@ -25,7 +25,6 @@ import com.acetering.app.views.ImageToast;
 import com.acetering.app.adapter.FiltableAdapter;
 import com.acetering.app.bean.Student;
 import com.acetering.app.event.CallbackEvent;
-import com.acetering.student_input.R;
 
 /**
  * Author:Acetering

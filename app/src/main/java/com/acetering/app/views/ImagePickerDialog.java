@@ -14,10 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,8 +24,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.acetering.app.R;
 import com.acetering.app.adapter.BasicAdapter;
-import com.acetering.student_input.R;
 
 import java.io.File;
 import java.io.FileInputStream;

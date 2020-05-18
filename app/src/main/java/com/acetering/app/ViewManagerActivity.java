@@ -19,12 +19,13 @@ import android.widget.EditText;
 
 import com.acetering.app.adapter.MyFragmentAdapter;
 import com.acetering.app.bean.Student;
+import com.acetering.app.service.ClipboardMonitorService;
 import com.acetering.app.service.IDayOfWeekConnection;
 import com.acetering.app.service.NetworkObserver;
 import com.acetering.app.service.QueryWeekdayService;
 import com.acetering.app.util.AppConfig;
 import com.acetering.app.views.DialogFactory;
-import com.acetering.student_input.R;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +52,7 @@ public class ViewManagerActivity extends AppCompatActivity {
     //    List<Student> datas;
     private AlertDialog searchDialog;
 
-    private Intent net_obeserver;
+    private Intent net_obeserver, clipboard_monitor;
     private IDayOfWeekConnection conn;
     private AlertDialog query_weekday_dialog;
 
@@ -94,6 +95,9 @@ public class ViewManagerActivity extends AppCompatActivity {
         startService(net_obeserver);
         Intent intent = new Intent(this, QueryWeekdayService.class);
         conn = new IDayOfWeekConnection();
+        //start service
+        clipboard_monitor = new Intent(this, ClipboardMonitorService.class);
+        startService(clipboard_monitor);
         bindService(intent, conn, BIND_AUTO_CREATE);
         Log.i(TAG, "---onCreate---");
     }
@@ -215,7 +219,9 @@ public class ViewManagerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopService(net_obeserver);
+//        stopService(net_obeserver);
+        unbindService(conn);
+        stopService(clipboard_monitor);
         Log.i(TAG, "---onDestroy---");
     }
 

@@ -2,7 +2,6 @@ package com.acetering.app.views;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.RemoteException;
 import android.view.LayoutInflater;
@@ -10,14 +9,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.acetering.app.ActivityLogin;
 import com.acetering.app.IDayOfWeek;
-import com.acetering.app.ViewManagerActivity;
+import com.acetering.app.R;
 import com.acetering.app.event.OnProgressReachedListener;
-import com.acetering.student_input.R;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -92,6 +88,7 @@ public class DialogFactory {
             public void onClick(View v) {
                 int day_of_week = -1;
                 try {
+
                     day_of_week = iDayOfWeek.getWeekday(Integer.parseInt(year.getText().toString()), Integer.parseInt(month.getText().toString()) - 1, Integer.parseInt(day.getText().toString()));
                 } catch (RemoteException e) {
                     e.printStackTrace();

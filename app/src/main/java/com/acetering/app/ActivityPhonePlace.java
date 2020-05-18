@@ -17,7 +17,6 @@ import com.acetering.app.util.AppConfig;
 import com.acetering.app.util.HttpUtil;
 import com.acetering.app.util.TelInfoQuery;
 import com.acetering.app.views.DialogFactory;
-import com.acetering.student_input.R;
 import com.google.gson.Gson;
 
 public class ActivityPhonePlace extends AppCompatActivity {

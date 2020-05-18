@@ -35,7 +35,6 @@ import com.acetering.app.bean.Student;
 import com.acetering.app.util.FileUtil;
 import com.acetering.app.util.PermissionUtil;
 import com.acetering.app.views.ImagePickerDialog;
-import com.acetering.student_input.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

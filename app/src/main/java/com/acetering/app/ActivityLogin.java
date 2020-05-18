@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,7 +19,7 @@ import com.acetering.app.dao.FakeUserDAO;
 import com.acetering.app.dao.I_UserDAO;
 import com.acetering.app.util.AppConfig;
 import com.acetering.app.views.DialogFactory;
-import com.acetering.student_input.R;
+
 
 
 public class ActivityLogin extends AppCompatActivity {
@@ -36,6 +37,9 @@ public class ActivityLogin extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        PackageManager pm = getPackageManager();
+        pm.queryBroadcastReceivers(new Intent("CLIPBOARD_MONITOR_ADD_STUDENT"), 0);
         setTitle(R.string.login);
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String id = sp.getString("account_id", "");
