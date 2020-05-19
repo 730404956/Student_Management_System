@@ -8,9 +8,11 @@ import androidx.fragment.app.Fragment;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,8 +34,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.acetering.app.bean.Student;
+import com.acetering.app.util.BitmapUtil;
 import com.acetering.app.util.FileUtil;
 import com.acetering.app.util.PermissionUtil;
+import com.acetering.app.views.DialogFactory;
 import com.acetering.app.views.ImagePickerDialog;
 
 import java.text.SimpleDateFormat;
@@ -53,7 +57,7 @@ public class FragmentStudent extends Fragment {
     private Spinner select_colleagues;
     private Spinner select_majors;
     private RadioGroup select_sex;
-    private AlertDialog dialog;
+    private AlertDialog errorDialog, imageSrcDialog, paletteDialog;
     private DatePickerDialog datePickerDialog;
     private String TAG = "fragment student";
     private Date birthday;
@@ -166,6 +170,7 @@ public class FragmentStudent extends Fragment {
         if (student == null) {
             clearData();
         } else {
+            img.setImageDrawable(new BitmapDrawable(getResources(), student.getImage()));
             input_name.setText(student.getStu_name());
             input_stu_id.setText(student.getStu_id());
             if (student.getGender().equals(((RadioButton) select_sex.getChildAt(0)).getText().toString())) {
@@ -219,6 +224,47 @@ public class FragmentStudent extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    private void showImagePickerDialog() {
+        if (imagePickerDialog == null) {
+            ImagePickerDialog.Builder builder = new ImagePickerDialog.Builder(context);
+            builder.setPositiveButton(getString(R.string.confirm), v1 -> {
+                if (builder.mDialog.getChoosen_img() != null) {
+                    BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), builder.mDialog.getChoosen_img());
+                    img.setImageDrawable(bitmapDrawable);
+                    image = builder.mDialog.getChoosen_img();
+                }
+            });
+            imagePickerDialog = builder.create();
+        }
+        imagePickerDialog.show();
+    }
+
+    private void showImageSrcDialog() {
+        if (imageSrcDialog == null) {
+            imageSrcDialog = DialogFactory.createChooseDialog(context, "请选择头像来源", new String[]{"从相册选择", "绘制新头像"}, (dialog, which) -> {
+                switch (which) {
+                    case 0:
+                        showImagePickerDialog();
+                        break;
+                    case 1:
+                        showPaletteDialog();
+                        break;
+                }
+            });
+        }
+        imageSrcDialog.show();
+    }
+
+    private void showPaletteDialog() {
+        if (paletteDialog == null) {
+            paletteDialog = DialogFactory.createPaletteDialog(context, ((cxt, data) -> {
+                image = BitmapUtil.zoomImg((Bitmap) data, 96, 96);
+                img.setImageDrawable(new BitmapDrawable(getResources(), image));
+            }));
+        }
+        paletteDialog.show();
+    }
+
     private void bindView() {
         input_name = contentView.findViewById(R.id.input_name);
         input_stu_id = contentView.findViewById(R.id.input_stu_id);
@@ -228,19 +274,9 @@ public class FragmentStudent extends Fragment {
         select_majors = contentView.findViewById(R.id.select_major);
         input_description = contentView.findViewById(R.id.description);
         img = contentView.findViewById(R.id.choose_img);
+        //set listener for image picker
         img.setOnClickListener(v -> {
-            if (imagePickerDialog == null) {
-                ImagePickerDialog.Builder builder = new ImagePickerDialog.Builder(context);
-                builder.setPositiveButton(getString(R.string.confirm), v1 -> {
-                    if (builder.mDialog.getChoosen_img() != null) {
-                        BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), builder.mDialog.getChoosen_img());
-                        img.setImageDrawable(bitmapDrawable);
-                        image = builder.mDialog.getChoosen_img();
-                    }
-                });
-                imagePickerDialog = builder.create();
-            }
-            imagePickerDialog.show();
+            showImageSrcDialog();
         });
         contentView.findViewById(R.id.load_data).setOnClickListener(v -> {
             PermissionUtil util = PermissionUtil.getInstance(context);
@@ -252,10 +288,10 @@ public class FragmentStudent extends Fragment {
         });
         Button btn_confirm = contentView.findViewById(R.id.btn_confirm);
         Button btn_cancel = contentView.findViewById(R.id.btn_cancel);
-        if (dialog == null) {
+        if (errorDialog == null) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("提示");
-            dialog = builder.create();
+            errorDialog = builder.create();
         }
         //bind listener for birthday select
         input_stu_birthday.setOnClickListener(new View.OnClickListener() {
@@ -318,31 +354,31 @@ public class FragmentStudent extends Fragment {
             public void onClick(View v) {
                 String name = input_name.getText().toString();
                 if (name.length() == 0) {
-                    dialog.setMessage("请输入姓名");
-                    dialog.show();
+                    errorDialog.setMessage("请输入姓名");
+                    errorDialog.show();
                     input_name.requestFocus();
                     return;
                 }
                 String stu_id = input_stu_id.getText().toString();
                 if (stu_id.length() == 0) {
-                    dialog.setMessage("请输入学号");
-                    dialog.show();
+                    errorDialog.setMessage("请输入学号");
+                    errorDialog.show();
                     input_stu_id.requestFocus();
                     return;
                 }
                 if (birthday == null) {
-                    dialog.setMessage("请选择生日");
-                    dialog.show();
+                    errorDialog.setMessage("请选择生日");
+                    errorDialog.show();
                     return;
                 }
                 if (select_colleagues.getSelectedItemPosition() == 0) {
-                    dialog.setMessage("请选择学院");
-                    dialog.show();
+                    errorDialog.setMessage("请选择学院");
+                    errorDialog.show();
                     return;
                 }
                 if (select_majors.getSelectedItemPosition() == 0) {
-                    dialog.setMessage("请选择专业");
-                    dialog.show();
+                    errorDialog.setMessage("请选择专业");
+                    errorDialog.show();
                     return;
                 }
                 String sex = String.valueOf(((RadioButton) contentView.findViewById(select_sex.getCheckedRadioButtonId())).getText());

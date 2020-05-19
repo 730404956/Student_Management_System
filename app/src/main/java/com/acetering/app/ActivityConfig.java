@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.acetering.app.util.AppConfig;
+import com.acetering.app.views.DialogFactory;
 
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 
@@ -14,6 +16,14 @@ public class ActivityConfig extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.root_preferences);
+        findPreference("sound_add_record").setOnPreferenceClickListener(preference -> {
+            DialogFactory.createSoundRecorderDialog(getContext(), "add.mp3").show();
+            return false;
+        });
+        findPreference("sound_delete_record").setOnPreferenceClickListener(preference -> {
+            DialogFactory.createSoundRecorderDialog(getContext(), "delete.mp3").show();
+            return false;
+        });
     }
 
     @Override

@@ -12,7 +12,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -26,6 +25,7 @@ import android.widget.TextView;
 
 import com.acetering.app.R;
 import com.acetering.app.adapter.BasicAdapter;
+import com.acetering.app.util.BitmapUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -108,7 +108,7 @@ public class ImagePickerDialog extends Dialog {
                     try {
                         FileInputStream fis = new FileInputStream(path);
                         Bitmap bitmap = BitmapFactory.decodeStream(fis);
-                        images.add(zoomImg(bitmap, 96, 96));
+                        images.add(BitmapUtil.zoomImg(bitmap, 96, 96));
 
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -120,21 +120,6 @@ public class ImagePickerDialog extends Dialog {
                 mCursor.close();
             }
         }).start();
-    }
-
-    public static Bitmap zoomImg(Bitmap bm, int newWidth, int newHeight) {
-        // 获得图片的宽高
-        int width = bm.getWidth();
-        int height = bm.getHeight();
-        // 计算缩放比例
-        float scaleWidth = ((float) newWidth) / width;
-        float scaleHeight = ((float) newHeight) / height;
-        // 取得想要缩放的matrix参数
-        Matrix matrix = new Matrix();
-        matrix.postScale(scaleWidth, scaleHeight);
-        // 得到新的图片
-        Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
-        return newbm;
     }
 
 

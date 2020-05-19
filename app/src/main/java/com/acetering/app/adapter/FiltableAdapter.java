@@ -60,7 +60,7 @@ public class FiltableAdapter<T extends IFiltableData> extends BasicAdapter<T> im
         });
         //call back
         if (onResult != null) {
-            onResult.doJob(context);
+            onResult.doJob(context, null);
         }
         //update view
         super.notifyDataSetChanged();
@@ -70,7 +70,7 @@ public class FiltableAdapter<T extends IFiltableData> extends BasicAdapter<T> im
     public void notifyDataSetInvalidated() {
         //call back
         if (onDataSetInvalid != null) {
-            onDataSetInvalid.doJob(context);
+            onDataSetInvalid.doJob(context, null);
         }
         super.notifyDataSetInvalidated();
     }

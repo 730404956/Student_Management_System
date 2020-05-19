@@ -18,6 +18,7 @@
             style="@style/common_text_label"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginRight="0dp"
             android:layout_weight="1"
             android:text="@string/label_stu_img"
             android:textAlignment="center"
@@ -26,7 +27,8 @@
         <ImageView
             android:id="@+id/choose_img"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="96dp"
+            android:layout_margin="5dp"
             android:layout_weight="2"
             app:srcCompat="@drawable/add_icon"></ImageView>
 

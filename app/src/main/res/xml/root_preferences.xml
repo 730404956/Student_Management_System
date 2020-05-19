@@ -8,16 +8,33 @@
         android:summary=""
         android:title="通用">
         <ListPreference
-            android:key="text_size"
-            android:title="字体大小"
-            android:summary="部分页面需重启后生效"
             android:entries="@array/font_size"
-            android:entryValues="@array/font_size_value" />
+            android:entryValues="@array/font_size_value"
+            android:key="text_size"
+            android:summary="部分页面需重启后生效"
+            android:title="字体大小" />
         <SwitchPreference
             android:key="enable_landscape"
-            android:title="开启横屏模式"
-            android:summary="是否允许横屏" />
+            android:summary="是否允许横屏"
+            android:title="开启横屏模式" />
 
+    </PreferenceCategory>
+    <!--  声音设置  -->
+    <PreferenceCategory
+        android:key="sound"
+        android:title="声音">
+        <SwitchPreference
+            android:key="sound_add"
+            android:title="默认添加音效" />
+        <Preference
+            android:key="sound_add_record"
+            android:title="录制添加音效" />
+        <SwitchPreference
+            android:key="sound_delete"
+            android:title="默认删除音效" />
+        <Preference
+            android:key="sound_delete_record"
+            android:title="录制删除音效" />
     </PreferenceCategory>
     <!-- 账户设置 -->
     <PreferenceCategory
@@ -25,12 +42,12 @@
         android:title="账户与安全">
         <EditTextPreference
             android:key="account_id"
-            android:title="账号"
-            android:summary="修改登录用户的账号" />
+            android:summary="修改登录用户的账号"
+            android:title="账号" />
         <EditTextPreference
             android:key="account_password"
-            android:title="密码"
-            android:summary="修改登录用户的密码" />
+            android:summary="修改登录用户的密码"
+            android:title="密码" />
 
     </PreferenceCategory>
     <PreferenceCategory

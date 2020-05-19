@@ -9,7 +9,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaDataSource;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +24,10 @@ import android.widget.TextView;
 
 import com.acetering.app.adapter.BasicAdapter;
 import com.acetering.app.adapter.SQLiteFiltableAdapter;
+import com.acetering.app.media.SoundRecorder;
 import com.acetering.app.views.ImageToast;
 import com.acetering.app.adapter.FiltableAdapter;
 import com.acetering.app.bean.Student;
-import com.acetering.app.event.CallbackEvent;
 
 /**
  * Author:Acetering
@@ -38,9 +41,12 @@ public class FragmentMain extends Fragment {
     private FiltableAdapter<Student> adapter;
     private String filter_key_words;
 
+    private MediaPlayer soundPlayer_add, soundPlayer_delete;
+
     private AlertDialog.Builder builder;
     private AlertDialog itemMenuDialog, itemDeleteConfirmDialog;
     private Student current_student;
+    private boolean play_default_add, play_default_delete;
 
     public FragmentMain() {
     }
@@ -50,6 +56,7 @@ public class FragmentMain extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         this.context = ViewManagerActivity.getInstance();
         super.onCreate(savedInstanceState);
+
     }
 
     @Nullable
@@ -79,6 +86,8 @@ public class FragmentMain extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        play_default_add = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sound_add", true);
+        play_default_delete = PreferenceManager.getDefaultSharedPreferences(context).getBoolean("sound_delete", true);
         ((Activity) context).setTitle(R.string.app_name);
     }
 
@@ -111,19 +120,11 @@ public class FragmentMain extends Fragment {
             }
         });
         //set message when filter result of nothing
-        adapter.setOnDataSetInvalid(new CallbackEvent() {
-            @Override
-            public void doJob(Context context) {
-                ImageToast.make(context, R.drawable.no, "没有查询到任何学生的信息！").show();
-            }
-        });
+        adapter.setOnDataSetInvalid((context, object) -> ImageToast.make(context, R.drawable.no, "没有查询到任何学生的信息！").show());
         //set listener for filter finished
-        adapter.setOnResult(new CallbackEvent() {
-            @Override
-            public void doJob(Context context) {
-                //update text in search info
-                showSearchFilter(filter_key_words);
-            }
+        adapter.setOnResult((context, object) -> {
+            //update text in search info
+            showSearchFilter(filter_key_words);
         });
         //设置列表项监听
         stu_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -191,11 +192,13 @@ public class FragmentMain extends Fragment {
         } else {
             ImageToast.make(context, R.drawable.yes, "修改学生" + student.getStu_name() + "成功！").show();
         }
+        playSound_add();
     }
 
     public void removeStudent(Student student) {
         adapter.removeItem(current_student);
         ImageToast.make(context, R.drawable.yes, "删除学生" + student.getStu_name() + "成功！").show();
+        playSound_delete();
     }
 
     /**
@@ -238,5 +241,26 @@ public class FragmentMain extends Fragment {
         filter_key_words = "";
         Filter filter = adapter.getFilter(Student.class);
         filter.filter(filter_key_words);
+    }
+
+    private void playSound_add() {
+        if (play_default_add) {
+            if (soundPlayer_add == null)
+                soundPlayer_add = MediaPlayer.create(context, R.raw.new_student);
+            soundPlayer_add.start();
+        } else {
+            new SoundRecorder(context).play("add.mp3");
+        }
+    }
+
+    private void playSound_delete() {
+        if (!play_default_delete) {
+            new SoundRecorder(context).play("delete.mp3");
+        } else {
+            if (soundPlayer_delete == null)
+                soundPlayer_delete = MediaPlayer.create(context, R.raw.delete_student);
+            soundPlayer_delete.start();
+        }
+
     }
 }

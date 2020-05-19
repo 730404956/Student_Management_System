@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.RemoteException;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,7 +14,9 @@ import android.widget.Toast;
 
 import com.acetering.app.IDayOfWeek;
 import com.acetering.app.R;
+import com.acetering.app.event.CallbackEvent;
 import com.acetering.app.event.OnProgressReachedListener;
+import com.acetering.app.media.SoundRecorder;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -96,6 +99,61 @@ public class DialogFactory {
                 Toast.makeText(context, "星期" + new String[]{"日", "一", "二", "三", "四", "五", "六"}[day_of_week - 1], Toast.LENGTH_SHORT).show();
             }
         });
+        dialog = builder.create();
+        return dialog;
+    }
+
+    public static AlertDialog createChooseDialog(Context context, String title, String[] items, DialogInterface.OnClickListener listener) {
+        AlertDialog dialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(title);
+        builder.setItems(items, listener);
+        dialog = builder.create();
+        return dialog;
+    }
+
+    public static AlertDialog createPaletteDialog(Context context, CallbackEvent onFinish) {
+        AlertDialog dialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View v = LayoutInflater.from(context).inflate(R.layout.palette_view, null);
+        builder.setView(v);
+        builder.setCancelable(false);
+        dialog = builder.create();
+        Button btn_confirm = v.findViewById(R.id.btn_confirm);
+        PaletteView paletteView = v.findViewById(R.id.palette);
+        btn_confirm.setOnClickListener(view -> {
+            onFinish.doJob(context, paletteView.getBitmap());
+            dialog.cancel();
+        });
+        v.findViewById(R.id.btn_cancel).setOnClickListener(v1 -> {
+            paletteView.clear();
+        });
+        return dialog;
+    }
+
+    public static AlertDialog createSoundRecorderDialog(Context context, String filepath) {
+        AlertDialog dialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View v = LayoutInflater.from(context).inflate(R.layout.sound_recorder, null);
+        SoundRecorder recorder = new SoundRecorder(context);
+        v.findViewById(R.id.btn_record).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        recorder.startRecord(filepath);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        recorder.stopRecord();
+                        break;
+                }
+                return false;
+            }
+        });
+        v.findViewById(R.id.btn_play).setOnClickListener(v1 -> {
+            recorder.play(filepath);
+        });
+        builder.setView(v);
         dialog = builder.create();
         return dialog;
     }
