@@ -1,9 +1,9 @@
 package com.acetering.app.adapter;
 
-/**
- * Author:Xiangrui Li
- * Date:2020/3/18
- * Last_Modify:2020/3/18
+/*
+  Author:Xiangrui Li
+  Date:2020/3/18
+  Last_Modify:2020/3/18
  */
 
 import android.content.Context;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class FiltableAdapter<T extends IFiltableData> extends BasicAdapter<T> implements Filterable {
+public class FiltableAdapter<T extends IFilterableData> extends BasicAdapter<T> implements Filterable {
     private String TAG = "FiltableAdapter";
     protected List<T> data;
     protected Filter mfilter;

@@ -25,8 +25,6 @@ public class TextCircleProgressBar extends View implements Runnable {
     private String TAG = "TextCirclePGBar";
     private Paint paint_main, paint_eraser, paint_text;
     private OnProgressReachedListener progressReachedListener;
-    private float radius;
-    private float inner_radius;
     private float textSize = 50;
 
     public TextCircleProgressBar(Context context, @Nullable AttributeSet attrs) {
@@ -48,11 +46,20 @@ public class TextCircleProgressBar extends View implements Runnable {
         Log.i(TAG, "onMeasure: ");
     }
 
+    /**
+     * set max progress, progress will post 1 each seconds
+     *
+     * @param max_progress max progress
+     */
+    public void setMax_progress(float max_progress) {
+        this.max_progress = max_progress;
+    }
+
     @Override
     public void run() {
-        while (postProgress(1)) {
+        while (postProgress(0.2f)) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(200);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -89,13 +96,12 @@ public class TextCircleProgressBar extends View implements Runnable {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        radius = getWidth() / 2f;
-        inner_radius = radius - 30f;
+        float radius = getWidth() / 2f;
+        float inner_radius = radius - 30f;
         canvas.drawCircle(radius, radius, radius, paint_main);
 
         canvas.drawCircle(radius, radius, inner_radius, paint_eraser);
         canvas.drawArc(0, 0, radius * 2, radius * 2, 0, current_progress / max_progress * 360, true, paint_eraser);
         canvas.drawText("" + (int) (max_progress - (int) current_progress), radius, radius, paint_text);
-        Log.i(TAG, "onDraw: " + radius);
     }
 }

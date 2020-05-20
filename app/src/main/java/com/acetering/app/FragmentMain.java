@@ -1,15 +1,9 @@
 package com.acetering.app;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.MediaDataSource;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -17,17 +11,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Filter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.acetering.app.adapter.BasicAdapter;
-import com.acetering.app.adapter.SQLiteFiltableAdapter;
-import com.acetering.app.media.SoundRecorder;
-import com.acetering.app.views.ImageToast;
 import com.acetering.app.adapter.FiltableAdapter;
+import com.acetering.app.adapter.SQLiteFilterableAdapter;
 import com.acetering.app.bean.Student;
+import com.acetering.app.util.BitmapUtil;
+import com.acetering.app.util.SoundUtil;
+import com.acetering.app.views.ImageToast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 
 /**
  * Author:Acetering
@@ -101,23 +100,20 @@ public class FragmentMain extends Fragment {
         //get list view from xml
         stu_list = contentView.findViewById(R.id.stu_list);
         //显示适配器视图绑定配置
-        adapter = new SQLiteFiltableAdapter(context, null, R.layout.student_info_item, new BasicAdapter.ViewBinder<Student>() {
-            @Override
-            public void bindView(BasicAdapter.ViewHolder holder, Student item) {
-                String sex_male = getString(R.string.sex_male);
-                holder.setText(R.id.stu_name, item.getStu_name())
-                        .setText(R.id.stu_id, item.getStu_id())
-                        .setText(R.id.stu_colleague, item.getColleague())
-                        .setText(R.id.stu_major, item.getMajor())
-                        .setImage(R.id.gender_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.male : R.drawable.female));
-                if (item.getImage() == null) {
-                    holder.setImage(R.id.stu_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.jobs : R.drawable.lena));
-                } else {
-                    BitmapDrawable drawable = new BitmapDrawable(getResources(), item.getImage());
-                    holder.setImage(R.id.stu_img, drawable);
-                }
-
+        adapter = new SQLiteFilterableAdapter(context, null, R.layout.student_info_item, (BasicAdapter.ViewBinder<Student>) (holder, item) -> {
+            String sex_male = getString(R.string.sex_male);
+            holder.setText(R.id.stu_name, item.getStu_name())
+                    .setText(R.id.stu_id, item.getStu_id())
+                    .setText(R.id.stu_colleague, item.getColleague())
+                    .setText(R.id.stu_major, item.getMajor())
+                    .setImage(R.id.gender_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.male : R.drawable.female));
+            if (item.getImage() == null) {
+                holder.setImage(R.id.stu_img, context.getDrawable(item.getGender().equals(sex_male) ? R.drawable.jobs : R.drawable.lena));
+            } else {
+                BitmapDrawable drawable = new BitmapDrawable(getResources(), BitmapUtil.bytesToBitmap(item.getImage()));
+                holder.setImage(R.id.stu_img, drawable);
             }
+
         });
         //set message when filter result of nothing
         adapter.setOnDataSetInvalid((context, object) -> ImageToast.make(context, R.drawable.no, "没有查询到任何学生的信息！").show());
@@ -127,17 +123,14 @@ public class FragmentMain extends Fragment {
             showSearchFilter(filter_key_words);
         });
         //设置列表项监听
-        stu_list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                //获取选中的学生对象
-                current_student = adapter.getItem(position);
-                //更新对话框显示文本
-                itemMenuDialog.setMessage(current_student.toString());
-                //显示菜单
-                itemMenuDialog.show();
-                return false;
-            }
+        stu_list.setOnItemLongClickListener((parent, view, position, id) -> {
+            //获取选中的学生对象
+            current_student = adapter.getItem(position);
+            //更新对话框显示文本
+            itemMenuDialog.setMessage(current_student.toString());
+            //显示菜单
+            itemMenuDialog.show();
+            return false;
         });
         //set adapter for list view
         stu_list.setAdapter(adapter);
@@ -150,20 +143,12 @@ public class FragmentMain extends Fragment {
      */
     private AlertDialog createItemMenuDialog() {
         //do something after click 'edit'
-        builder.setPositiveButton(R.string.edit, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //turn to change student info view
-                ViewManagerActivity.getInstance().changeToStudentFragment(current_student);
-            }
+        builder.setPositiveButton(R.string.edit, (dialog, which) -> {
+            //turn to change student info view
+            ViewManagerActivity.getInstance().changeToStudentFragment(current_student);
         });
         //do something after click 'delete'
-        builder.setNegativeButton(R.string.remove, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                itemDeleteConfirmDialog.show();
-            }
-        });
+        builder.setNegativeButton(R.string.remove, (dialog, which) -> itemDeleteConfirmDialog.show());
         builder.setTitle("学生详情");
         return builder.create();
     }
@@ -249,13 +234,13 @@ public class FragmentMain extends Fragment {
                 soundPlayer_add = MediaPlayer.create(context, R.raw.new_student);
             soundPlayer_add.start();
         } else {
-            new SoundRecorder(context).play("add.mp3");
+            SoundUtil.play(context, "add.mp3");
         }
     }
 
     private void playSound_delete() {
         if (!play_default_delete) {
-            new SoundRecorder(context).play("delete.mp3");
+            SoundUtil.play(context, "delete.mp3");
         } else {
             if (soundPlayer_delete == null)
                 soundPlayer_delete = MediaPlayer.create(context, R.raw.delete_student);

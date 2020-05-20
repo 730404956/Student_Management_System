@@ -1,13 +1,5 @@
 package com.acetering.app;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.viewpager.widget.ViewPager;
-
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,20 +18,17 @@ import com.acetering.app.service.QueryWeekdayService;
 import com.acetering.app.util.AppConfig;
 import com.acetering.app.views.DialogFactory;
 
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.viewpager.widget.ViewPager;
 
 public class ViewManagerActivity extends AppCompatActivity {
 
-    private String[] stu_names = new String[]{"Jobs", "Lena"};
-    private String[] stu_ids = new String[]{"25037593", "33268512"};
-    private String[] genders = new String[]{"男", "女"};
-    private Date[] birthdays = new Date[]{new Date(), new Date()};
-    private String[] colleagues = new String[]{"计算机学院", "电气学院"};
-    private String[] majors = new String[]{"软件工程", "电气工程"};
     private String TAG = "View Manager";
     ViewPager pager;
     MyFragmentAdapter adapter;
@@ -49,27 +38,12 @@ public class ViewManagerActivity extends AppCompatActivity {
     FragmentMain fragment_main;
     ActivityConfig fragment_setting;
     FragmentStudent fragment_student;
-    //    List<Student> datas;
     private AlertDialog searchDialog;
 
     private Intent net_obeserver, clipboard_monitor;
     private IDayOfWeekConnection conn;
     private AlertDialog query_weekday_dialog;
 
-
-    private void loadData(Bundle savedInstance) {
-//        if (savedInstance != null) {
-//            Student[] students = (Student[]) (savedInstance.get("datas"));
-//            datas = new ArrayList<>();
-//            datas.addAll(Arrays.asList(students));
-//        } else {
-//            for (int i = 0; i < 2; i++) {
-//                datas.add(new Student(stu_names[i], stu_ids[i], genders[i], birthdays[i], colleagues[i], majors[i], ""));
-//            }
-//            StudentDAL dal=new StudentDAL(this);
-//            datas.addAll(dal.getAllStudents());
-//        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +56,6 @@ public class ViewManagerActivity extends AppCompatActivity {
         fragment_student = new FragmentStudent();
         fragment_setting = new ActivityConfig();
         instance = this;
-        loadData(savedInstanceState);
         pager = findViewById(R.id.ly_content);
         List<Fragment> fragments = new ArrayList<>();
         fragments.add(fragment_student);
@@ -92,13 +65,12 @@ public class ViewManagerActivity extends AppCompatActivity {
         pager.setAdapter(adapter);
         changeToMainFragment();
         net_obeserver = new Intent(this, NetworkObserver.class);
+        //start service to monitor network
         startService(net_obeserver);
-        Intent intent = new Intent(this, QueryWeekdayService.class);
-        conn = new IDayOfWeekConnection();
-        //start service
+        //start service to monitor clipboard
         clipboard_monitor = new Intent(this, ClipboardMonitorService.class);
         startService(clipboard_monitor);
-        bindService(intent, conn, BIND_AUTO_CREATE);
+
         Log.i(TAG, "---onCreate---");
     }
 
@@ -122,8 +94,13 @@ public class ViewManagerActivity extends AppCompatActivity {
                 startActivity(new Intent("com.acetering.student_input.QUERY_TEL_INFO"));
                 break;
             case R.id.query_weekday_item:
-                if (query_weekday_dialog == null)
+                if (query_weekday_dialog == null) {
+                    Intent intent = new Intent(this, QueryWeekdayService.class);
+                    conn = new IDayOfWeekConnection();
+                    bindService(intent, conn, BIND_AUTO_CREATE);
                     query_weekday_dialog = DialogFactory.createQueryWeekdayDialog(this, conn.getiDayOfWeek());
+                }
+
                 query_weekday_dialog.show();
         }
         return super.onOptionsItemSelected(item);
@@ -136,20 +113,14 @@ public class ViewManagerActivity extends AppCompatActivity {
             View view = LayoutInflater.from(this).inflate(R.layout.input_dialog, null);
             builder.setView(view);
             EditText input = view.findViewById(R.id.editText);
-            builder.setPositiveButton(R.string.search, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String input_text = input.getText().toString();
-                    fragment_main.filter(input_text);
-                    searchDialog.cancel();
-                }
+            builder.setPositiveButton(R.string.search, (dialog, which) -> {
+                String input_text = input.getText().toString();
+                fragment_main.filter(input_text);
+                searchDialog.cancel();
             });
-            builder.setNegativeButton(R.string.clear_filter, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    fragment_main.clearFilter();
-                    searchDialog.cancel();
-                }
+            builder.setNegativeButton(R.string.clear_filter, (dialog, which) -> {
+                fragment_main.clearFilter();
+                searchDialog.cancel();
             });
             searchDialog = builder.create();
         }
@@ -196,15 +167,6 @@ public class ViewManagerActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-//        Student[] students = new Student[datas.size()];
-//        datas.toArray(students);
-//        outState.putSerializable("datas", students);
-//        Log.i(TAG, "---onSaveInstanceState---");
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         Log.i(TAG, "---onStart:---");
@@ -219,8 +181,10 @@ public class ViewManagerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        stopService(net_obeserver);
-        unbindService(conn);
+        stopService(net_obeserver);
+        if (conn != null) {
+            unbindService(conn);
+        }
         stopService(clipboard_monitor);
         Log.i(TAG, "---onDestroy---");
     }
@@ -235,6 +199,12 @@ public class ViewManagerActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.i(TAG, "---onResume---");
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 
     public void addNewStudent(Student student) {

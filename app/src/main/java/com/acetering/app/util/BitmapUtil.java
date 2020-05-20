@@ -1,7 +1,10 @@
 package com.acetering.app.util;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Create by Acetering(Xiangrui Li)
@@ -21,5 +24,19 @@ public class BitmapUtil {
         // 得到新的图片
         Bitmap newbm = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, true);
         return newbm;
+    }
+
+    public static byte[] bitmapToBytes(Bitmap bitmap) {
+        if (bitmap == null)
+            return null;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
+    }
+
+    public static Bitmap bytesToBitmap(byte[] data) {
+        if (data == null)
+            return null;
+        return BitmapFactory.decodeByteArray(data, 0, data.length);
     }
 }

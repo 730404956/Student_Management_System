@@ -98,17 +98,15 @@ public class ActivityLogin extends AppCompatActivity {
         return pgDialog;
     }
 
-    private AlertDialog showAdsDialog() {
+    private void showAdsDialog() {
         if (adsDialog == null) {
             adsDialog = DialogFactory.createAdsDialog(this, () -> {
                 startActivity(new Intent(ActivityLogin.this, ViewManagerActivity.class));
                 adsDialog.cancel();
-            }, null);
-        } else {
-
+                finish();
+            }, null, 10);
         }
         adsDialog.show();
-        return adsDialog;
     }
 
     private AlertDialog createLoginWrongDialog() {
@@ -139,6 +137,7 @@ public class ActivityLogin extends AppCompatActivity {
             switch (msg.what) {
                 case 0://登录成功
                     context.showAdsDialog();
+
                     break;
                 case 1://账号不存在
                 case 2://账号和密码不匹配

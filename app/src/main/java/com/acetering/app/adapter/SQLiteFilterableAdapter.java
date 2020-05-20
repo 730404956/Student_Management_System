@@ -12,13 +12,13 @@ import java.util.List;
  * Create by Acetering(Xiangrui Li)
  * On 2020/4/21
  */
-public class SQLiteFiltableAdapter extends FiltableAdapter {
-    StudentDAL dal;
-    List<Student> newStudents;
-    List<Student> removedStudents;
-    List<Student> modifiedStudents;
+public class SQLiteFilterableAdapter extends FiltableAdapter<Student> {
+    private StudentDAL dal;
+    private List<Student> newStudents;
+    private List<Student> removedStudents;
+    private List<Student> modifiedStudents;
 
-    public SQLiteFiltableAdapter(Context context, List<Student> dataResources, int itemLayoutResourceId, ViewBinder binder) {
+    public SQLiteFilterableAdapter(Context context, List<Student> dataResources, int itemLayoutResourceId, ViewBinder binder) {
         super(context, dataResources, itemLayoutResourceId, binder);
         dal = new StudentDAL(context);
         if (dataResources == null) {
@@ -28,30 +28,30 @@ public class SQLiteFiltableAdapter extends FiltableAdapter {
     }
 
     @Override
-    public void addItem(Object item) {
+    public void addItem(Student item) {
         super.addItem(item);
         if (newStudents == null) {
             newStudents = new ArrayList<>();
         }
-        newStudents.add((Student) item);
+        newStudents.add(item);
     }
 
     @Override
-    public void removeItem(Object item) {
+    public void removeItem(Student item) {
         super.removeItem(item);
         if (removedStudents == null) {
             removedStudents = new ArrayList<>();
         }
-        removedStudents.add((Student) item);
+        removedStudents.add(item);
     }
 
     @Override
-    public void modifyItem(int index, Object item) {
+    public void modifyItem(int index, Student item) {
         super.modifyItem(index, item);
         if (modifiedStudents == null) {
             modifiedStudents = new ArrayList<>();
         }
-        modifiedStudents.add((Student) item);
+        modifiedStudents.add(item);
     }
 
     @Override

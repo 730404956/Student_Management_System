@@ -2,10 +2,6 @@ package com.acetering.app.views;
 
 import android.app.Dialog;
 
-/**
- * Create by Acetering(Xiangrui Li)
- * On 2020/5/6
- */
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -35,20 +31,16 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 
+/**
+ * Create by Acetering(Xiangrui Li)
+ * On 2020/5/6
+ */
 public class ImagePickerDialog extends Dialog {
     BasicAdapter<Bitmap> adapter;
     List<Bitmap> images;
     Context context;
     Bitmap choosen_img;
 
-    //    Handler mHandler=new Handler(){
-//        @Override
-//        public void handleMessage(Message msg) {
-//            switch(msg.what){
-//                case 0:break;
-//            }
-//        }
-//    };
     private ImagePickerDialog(Context context, int themeResId) {
         super(context, themeResId);
         this.context = context;
@@ -82,43 +74,40 @@ public class ImagePickerDialog extends Dialog {
         //显示进度条
         //DialogFactory.createProgressDialog(getContext(),"加载中，请稍后……").show();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                ContentResolver mContentResolver = context.getContentResolver();
+        new Thread(() -> {
+            Uri mImageUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            ContentResolver mContentResolver = context.getContentResolver();
 
-                //只查询jpeg和png的图片
-                Cursor mCursor = mContentResolver.query(mImageUri, null,
-                        MediaStore.Images.Media.MIME_TYPE + "=? or "
-                                + MediaStore.Images.Media.MIME_TYPE + "=?",
-                        new String[]{"image/jpeg", "image/png"}, MediaStore.Images.Media.DATE_MODIFIED);
+            //只查询jpeg和png的图片
+            Cursor mCursor = mContentResolver.query(mImageUri, null,
+                    MediaStore.Images.Media.MIME_TYPE + "=? or "
+                            + MediaStore.Images.Media.MIME_TYPE + "=?",
+                    new String[]{"image/jpeg", "image/png"}, MediaStore.Images.Media.DATE_MODIFIED);
 
-                if (mCursor == null) {
-                    return;
-                }
-
-                while (mCursor.moveToNext()) {
-                    //获取图片的路径
-                    String path = mCursor.getString(mCursor
-                            .getColumnIndex(MediaStore.Images.Media.DATA));
-                    //获取该图片的父路径名
-                    String parentName = new File(path).getParentFile().getName();
-
-                    try {
-                        FileInputStream fis = new FileInputStream(path);
-                        Bitmap bitmap = BitmapFactory.decodeStream(fis);
-                        images.add(BitmapUtil.zoomImg(bitmap, 96, 96));
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                //通知Handler扫描图片完成
-                //mHandler.sendEmptyMessage(0);
-                mCursor.close();
+            if (mCursor == null) {
+                return;
             }
+
+            while (mCursor.moveToNext()) {
+                //获取图片的路径
+                String path = mCursor.getString(mCursor
+                        .getColumnIndex(MediaStore.Images.Media.DATA));
+                //获取该图片的父路径名
+                String parentName = new File(path).getParentFile().getName();
+
+                try {
+                    FileInputStream fis = new FileInputStream(path);
+                    Bitmap bitmap = BitmapFactory.decodeStream(fis);
+                    images.add(BitmapUtil.zoomImg(bitmap, 96, 96));
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            //通知Handler扫描图片完成
+            //mHandler.sendEmptyMessage(0);
+            mCursor.close();
         }).start();
     }
 

@@ -32,12 +32,8 @@ public class StudentDAL implements StudentDAO {
 
     @Override
     public boolean addStudent(Student student) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
         try {
-            if (student.getImage() != null) {
-                student.getImage().compress(Bitmap.CompressFormat.PNG, 100, stream);
-            }
-            db.execSQL("insert into student_info values(?,?,?,?,?,?,?,?)", new Object[]{student.getStu_id(), student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription(), stream.toByteArray()});
+            db.execSQL("insert into student_info values(?,?,?,?,?,?,?,?)", new Object[]{student.getStu_id(), student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription(), student.getImage()});
             Log.i(TAG, "addStudent: " + student.getStu_name());
         } catch (SQLException e) {
             e.printStackTrace();
@@ -63,9 +59,7 @@ public class StudentDAL implements StudentDAO {
     @Override
     public boolean changeStudentInfo(Student student) {
         try {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            student.getImage().compress(Bitmap.CompressFormat.PNG, 100, stream);
-            db.execSQL("update student_info set name=? ,gender=?,colleague=?,major=?,birthday=?,description=?,img=?  where id=?;", new Object[]{student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription(), stream.toByteArray(), student.getStu_id()});
+            db.execSQL("update student_info set name=? ,gender=?,colleague=?,major=?,birthday=?,description=?,img=?  where id=?;", new Object[]{student.getStu_name(), student.getGender(), student.getColleague(), student.getMajor(), new SimpleDateFormat("yyyy-MM-dd").format(student.getBirthday()), student.getDescription(), student.getImage(), student.getStu_id()});
 
             Log.i(TAG, "changeStudentInfo: " + student.getStu_name());
         } catch (SQLException e) {
@@ -105,14 +99,8 @@ public class StudentDAL implements StudentDAO {
             Date birthday = Date.valueOf(cursor.getString(5));
             String stu_description = cursor.getString(6);
             Student s = new Student(stu_name, stu_id, stu_gender, birthday, stu_colleague, stu_major, stu_description);
-            Bitmap img = null;
-            try {
-                byte[] img_bytes = cursor.getBlob(7);
-                img = BitmapFactory.decodeByteArray(img_bytes, 0, img_bytes.length);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            s.setImage(img);
+            byte[] img_bytes = cursor.getBlob(7);
+            s.setImage(img_bytes);
             students.add(s);
         } while (cursor.moveToNext());
         cursor.close();

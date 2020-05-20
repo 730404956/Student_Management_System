@@ -14,7 +14,8 @@ import com.acetering.app.ViewManagerActivity;
 public class NetworkObserver extends Service {
     Thread net = null;
     boolean net_stop;
-    Handler handler = new Handler() {
+
+    static class MyHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -30,7 +31,9 @@ public class NetworkObserver extends Service {
                     break;
             }
         }
-    };
+    }
+
+    Handler handler = new MyHandler();
 
     public NetworkObserver() {
     }
@@ -45,22 +48,19 @@ public class NetworkObserver extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         net_stop = false;
         if (net == null) {
-            net = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (!net_stop) {
-                        if (isNetworkConnected(getBaseContext())) {
-                            handler.sendEmptyMessage(1);
-                        } else {
-                            handler.sendEmptyMessage(0);
-                        }
-                        try {
-                            Thread.sleep(500);
-                        } catch (Exception e) {
-
-                        }
-
+            net = new Thread(() -> {
+                while (!net_stop) {
+                    if (isNetworkConnected(getBaseContext())) {
+                        handler.sendEmptyMessage(1);
+                    } else {
+                        handler.sendEmptyMessage(0);
                     }
+                    try {
+                        Thread.sleep(500);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                 }
             });
         }

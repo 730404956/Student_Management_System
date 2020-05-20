@@ -1,22 +1,15 @@
 package com.acetering.app;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -38,11 +30,17 @@ import com.acetering.app.util.BitmapUtil;
 import com.acetering.app.util.FileUtil;
 import com.acetering.app.util.PermissionUtil;
 import com.acetering.app.views.DialogFactory;
+import com.acetering.app.views.DrawingPanelView;
 import com.acetering.app.views.ImagePickerDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 
 
 public class FragmentStudent extends Fragment {
@@ -52,12 +50,13 @@ public class FragmentStudent extends Fragment {
     private EditText input_stu_id;
     private EditText input_description;
     private TextView input_stu_birthday;
-    private ImageView img;
+    private ImageView icon_img_view;
     private Student student;
     private Spinner select_colleagues;
     private Spinner select_majors;
     private RadioGroup select_sex;
-    private AlertDialog errorDialog, imageSrcDialog, paletteDialog;
+    private AlertDialog errorDialog, imageSrcDialog;
+    private Dialog paletteDialog;
     private DatePickerDialog datePickerDialog;
     private String TAG = "fragment student";
     private Date birthday;
@@ -121,8 +120,10 @@ public class FragmentStudent extends Fragment {
         String colleague = select_colleagues.getSelectedItem().toString();
         String major = select_majors.getSelectedItem().toString();
         String description = input_description.getText().toString();
-        Student student_instance = Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major, description));
-        student = student_instance;
+        student = Student.copy(student, new Student(name, stu_id, sex, birthday, colleague, major, description));
+        if (image != null) {
+            student.setImage(image);
+        }
         super.onPause();
     }
 
@@ -135,17 +136,14 @@ public class FragmentStudent extends Fragment {
     private void showDatePicker() {
         if (datePickerDialog == null) {
             datePickerDialog = new DatePickerDialog(context);
-            datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
-                @Override
-                public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                    birthday = new Date();
-                    Log.i(TAG, "onDateSet: " + dayOfMonth);
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(year, month, dayOfMonth);
-                    birthday.setTime(calendar.getTimeInMillis());
-                    SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
-                    input_stu_birthday.setText(sf.format(birthday));
-                }
+            datePickerDialog.setOnDateSetListener((view, year, month, dayOfMonth) -> {
+                birthday = new Date();
+                Log.i(TAG, "onDateSet: " + dayOfMonth);
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, dayOfMonth);
+                birthday.setTime(calendar.getTimeInMillis());
+                SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+                input_stu_birthday.setText(sf.format(birthday));
             });
         }
         datePickerDialog.show();
@@ -170,7 +168,12 @@ public class FragmentStudent extends Fragment {
         if (student == null) {
             clearData();
         } else {
-            img.setImageDrawable(new BitmapDrawable(getResources(), student.getImage()));
+            image = BitmapUtil.bytesToBitmap(student.getImage());
+            if (image == null) {
+                icon_img_view.setImageDrawable(getResources().getDrawable(R.drawable.jobs, null));
+            } else {
+                icon_img_view.setImageDrawable(new BitmapDrawable(getResources(), image));
+            }
             input_name.setText(student.getStu_name());
             input_stu_id.setText(student.getStu_id());
             if (student.getGender().equals(((RadioButton) select_sex.getChildAt(0)).getText().toString())) {
@@ -195,6 +198,7 @@ public class FragmentStudent extends Fragment {
     }
 
     private void clearData() {
+        icon_img_view.setImageDrawable(getResources().getDrawable(R.drawable.add_icon, null));
         input_name.setText("");
         input_stu_id.setText("");
         input_stu_birthday.setText(getText(R.string.please_choose));
@@ -230,7 +234,7 @@ public class FragmentStudent extends Fragment {
             builder.setPositiveButton(getString(R.string.confirm), v1 -> {
                 if (builder.mDialog.getChoosen_img() != null) {
                     BitmapDrawable bitmapDrawable = new BitmapDrawable(getResources(), builder.mDialog.getChoosen_img());
-                    img.setImageDrawable(bitmapDrawable);
+                    icon_img_view.setImageDrawable(bitmapDrawable);
                     image = builder.mDialog.getChoosen_img();
                 }
             });
@@ -257,9 +261,9 @@ public class FragmentStudent extends Fragment {
 
     private void showPaletteDialog() {
         if (paletteDialog == null) {
-            paletteDialog = DialogFactory.createPaletteDialog(context, ((cxt, data) -> {
+            paletteDialog = new DrawingPanelView(context, ((cxt, data) -> {
                 image = BitmapUtil.zoomImg((Bitmap) data, 96, 96);
-                img.setImageDrawable(new BitmapDrawable(getResources(), image));
+                icon_img_view.setImageDrawable(new BitmapDrawable(getResources(), image));
             }));
         }
         paletteDialog.show();
@@ -273,9 +277,9 @@ public class FragmentStudent extends Fragment {
         select_colleagues = contentView.findViewById(R.id.select_colleague);
         select_majors = contentView.findViewById(R.id.select_major);
         input_description = contentView.findViewById(R.id.description);
-        img = contentView.findViewById(R.id.choose_img);
+        icon_img_view = contentView.findViewById(R.id.choose_img);
         //set listener for image picker
-        img.setOnClickListener(v -> {
+        icon_img_view.setOnClickListener(v -> {
             showImageSrcDialog();
         });
         contentView.findViewById(R.id.load_data).setOnClickListener(v -> {
@@ -294,18 +298,13 @@ public class FragmentStudent extends Fragment {
             errorDialog = builder.create();
         }
         //bind listener for birthday select
-        input_stu_birthday.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePicker();
-            }
-        });
+        input_stu_birthday.setOnClickListener(v -> showDatePicker());
         //bind adapter for colleague spinner
         final ArrayAdapter<String> simple_colleague_adpter = new ArrayAdapter<>(context, R.layout.simple_string_spinner_item);
         simple_colleague_adpter.addAll(colleague_names);
         select_colleagues.setAdapter(simple_colleague_adpter);
         //bind adapter for major spinner
-        simple_major_adapter = new ArrayAdapter<String>(context, R.layout.simple_string_spinner_item);
+        simple_major_adapter = new ArrayAdapter<>(context, R.layout.simple_string_spinner_item);
         simple_major_adapter.addAll(major_default);
         select_majors.setAdapter(simple_major_adapter);
         //connect content for colleague and major
@@ -349,60 +348,52 @@ public class FragmentStudent extends Fragment {
             }
         });
         //bind listener for btn_confirm
-        btn_confirm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String name = input_name.getText().toString();
-                if (name.length() == 0) {
-                    errorDialog.setMessage("请输入姓名");
-                    errorDialog.show();
-                    input_name.requestFocus();
-                    return;
-                }
-                String stu_id = input_stu_id.getText().toString();
-                if (stu_id.length() == 0) {
-                    errorDialog.setMessage("请输入学号");
-                    errorDialog.show();
-                    input_stu_id.requestFocus();
-                    return;
-                }
-                if (birthday == null) {
-                    errorDialog.setMessage("请选择生日");
-                    errorDialog.show();
-                    return;
-                }
-                if (select_colleagues.getSelectedItemPosition() == 0) {
-                    errorDialog.setMessage("请选择学院");
-                    errorDialog.show();
-                    return;
-                }
-                if (select_majors.getSelectedItemPosition() == 0) {
-                    errorDialog.setMessage("请选择专业");
-                    errorDialog.show();
-                    return;
-                }
-                String sex = String.valueOf(((RadioButton) contentView.findViewById(select_sex.getCheckedRadioButtonId())).getText());
-                String colleague = select_colleagues.getSelectedItem().toString();
-                String major = select_majors.getSelectedItem().toString();
-                String description = input_description.getText().toString();
-                Student r_student = new Student(name, stu_id, sex, birthday, colleague, major, description);
-                r_student.setImage(image);
-                ViewManagerActivity.getInstance().addNewStudent(Student.copy(student, r_student));
-                ViewManagerActivity.getInstance().changeToMainFragment();
+        btn_confirm.setOnClickListener(v -> {
+            String name = input_name.getText().toString();
+            if (name.length() == 0) {
+                errorDialog.setMessage("请输入姓名");
+                errorDialog.show();
+                input_name.requestFocus();
+                return;
             }
+            String stu_id = input_stu_id.getText().toString();
+            if (stu_id.length() == 0) {
+                errorDialog.setMessage("请输入学号");
+                errorDialog.show();
+                input_stu_id.requestFocus();
+                return;
+            }
+            if (birthday == null) {
+                errorDialog.setMessage("请选择生日");
+                errorDialog.show();
+                return;
+            }
+            if (select_colleagues.getSelectedItemPosition() == 0) {
+                errorDialog.setMessage("请选择学院");
+                errorDialog.show();
+                return;
+            }
+            if (select_majors.getSelectedItemPosition() == 0) {
+                errorDialog.setMessage("请选择专业");
+                errorDialog.show();
+                return;
+            }
+            String sex = String.valueOf(((RadioButton) contentView.findViewById(select_sex.getCheckedRadioButtonId())).getText());
+            String colleague = select_colleagues.getSelectedItem().toString();
+            String major = select_majors.getSelectedItem().toString();
+            String description = input_description.getText().toString();
+            Student r_student = new Student(name, stu_id, sex, birthday, colleague, major, description);
+            r_student.setImage(image);
+            ViewManagerActivity.getInstance().addNewStudent(Student.copy(student, r_student));
+            ViewManagerActivity.getInstance().changeToMainFragment();
         });
         //bind listener for btn_cancel
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (student == null) {
-                    clearData();
-                } else {
-                    initData(student);
-                }
+        btn_cancel.setOnClickListener(v -> {
+            if (student == null) {
+                clearData();
+            } else {
+                initData(student);
             }
         });
     }
-
-
 }

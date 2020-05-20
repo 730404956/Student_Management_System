@@ -2,7 +2,8 @@ package com.acetering.app.bean;
 
 import android.graphics.Bitmap;
 
-import com.acetering.app.adapter.IFiltableData;
+import com.acetering.app.adapter.IFilterableData;
+import com.acetering.app.util.BitmapUtil;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -13,8 +14,8 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class Student implements Serializable, IFiltableData {
-    private Bitmap image = null;
+public class Student implements Serializable, IFilterableData {
+    private byte[] image = null;
     private String stu_name;
     private String stu_id;
     private String gender;
@@ -70,6 +71,10 @@ public class Student implements Serializable, IFiltableData {
         return major;
     }
 
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
     public void setMajor(String major) {
         this.major = major;
     }
@@ -82,12 +87,12 @@ public class Student implements Serializable, IFiltableData {
         this.birthday = birthday;
     }
 
-    public Bitmap getImage() {
+    public byte[] getImage() {
         return image;
     }
 
     public void setImage(Bitmap image) {
-        this.image = image;
+        this.image = BitmapUtil.bitmapToBytes(image);
     }
 
     @Override
@@ -131,12 +136,9 @@ public class Student implements Serializable, IFiltableData {
         if (a == null) {
             return student;
         }
-        if (student.image == null) {
-
-        } else {
-            a.image = student.image.copy(Bitmap.Config.ARGB_8888, true);
+        if (student.image != null) {
+            a.image = student.image.clone();
         }
-
         a.stu_name = student.stu_name;
         a.stu_id = student.stu_id;
         a.gender = student.gender;
@@ -161,7 +163,7 @@ public class Student implements Serializable, IFiltableData {
     }
 
     @Override
-    public Map<String, String> getFiltData() {
+    public Map<String, String> getFilterableData() {
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
         Map<String, String> result = new HashMap<>();
         result.put("name", stu_name);

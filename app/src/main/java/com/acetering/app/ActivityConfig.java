@@ -6,7 +6,6 @@ import android.os.Bundle;
 import com.acetering.app.util.AppConfig;
 import com.acetering.app.views.DialogFactory;
 
-import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
 

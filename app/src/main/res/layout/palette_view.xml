@@ -5,53 +5,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.acetering.app.views.PaletteView
-        android:id="@+id/palette"
-        android:layout_width="match_parent"
-        android:layout_height="400dp"
-        android:layout_weight="0" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:orientation="horizontal"
-        android:visibility="gone">
+        android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/imageButton"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pen_size" />
+
+        <SeekBar
+            android:id="@+id/size_seekbar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/add_icon" />
-
-        <ImageButton
-            android:id="@+id/imageButton2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/add_icon" />
-
-        <ImageButton
-            android:id="@+id/imageButton3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/add_icon" />
-
-        <ImageButton
-            android:id="@+id/imageButton4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/add_icon" />
-
-        <ImageButton
-            android:id="@+id/imageButton5"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/add_icon" />
+            android:layout_weight="9"
+            android:max="200"
+            android:progress="0" />
     </LinearLayout>
 
     <LinearLayout
@@ -59,20 +29,89 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btn_cancel"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/round_corner_button_cancel"
-            android:text="@string/cancel" />
+            android:text="@string/pen_color" />
 
-        <Button
-            android:id="@+id/btn_confirm"
-            android:layout_width="wrap_content"
+        <SeekBar
+            android:id="@+id/color_seekbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:max="16777215"
+            android:progress="0" />
+
+        <ImageView
+            android:id="@+id/color_img"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:background="#000000"
+            android:contentDescription="@string/pen_color"
+            app:srcCompat="?attr/selectableItemBackground" />
+    </LinearLayout>
+
+    <com.acetering.app.views.PaletteView
+        android:id="@+id/palette"
+        android:layout_width="match_parent"
+        android:layout_height="400dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <ImageButton
+            android:id="@+id/btn_undo"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/round_corner_button"
-            android:text="@string/confirm" />
+            android:contentDescription="@string/undo"
+            app:srcCompat="@android:drawable/ic_menu_revert" />
+
+        <ImageButton
+            android:id="@+id/btn_redo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/redo"
+            app:srcCompat="@android:drawable/ic_menu_directions" />
+
+        <ImageButton
+            android:id="@+id/btn_pen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/pen"
+            app:srcCompat="@android:drawable/ic_menu_edit" />
+
+        <ImageButton
+            android:id="@+id/btn_earser"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/eraser"
+            app:srcCompat="@android:drawable/ic_menu_delete" />
+
+        <ImageButton
+            android:id="@+id/btn_clear"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/cancel"
+            app:srcCompat="@drawable/no" />
+
+        <ImageButton
+            android:id="@+id/btn_confirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:contentDescription="@string/confirm"
+            app:srcCompat="@drawable/yes" />
     </LinearLayout>
+
 </LinearLayout>

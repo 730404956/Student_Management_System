@@ -96,7 +96,7 @@ public class FileUtil {
         return code;
     }
 
-    public static final int FILE_SELECT_CODE = 0;
+    public static final int FILE_SELECT_CODE = 0x95258f;
 
     public Intent getFileChooserIntent() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);

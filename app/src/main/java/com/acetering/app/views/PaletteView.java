@@ -20,10 +20,6 @@ import java.util.List;
  * Create by Acetering(Xiangrui Li)
  * On 2020/5/18
  */
-
-/**
- * Created by wensefu on 17-3-21.
- */
 public class PaletteView extends View {
 
     private Paint mPaint;
@@ -71,6 +67,10 @@ public class PaletteView extends View {
         return mBufferBitmap;
     }
 
+    public void setBitmap(Bitmap mBufferBitmap) {
+        this.mBufferBitmap = mBufferBitmap;
+    }
+
     public void setCallback(Callback callback) {
         mCallback = callback;
     }
@@ -89,7 +89,7 @@ public class PaletteView extends View {
         mClearMode = new PorterDuffXfermode(PorterDuff.Mode.CLEAR);
     }
 
-    private void initBuffer() {
+    public void initBuffer() {
         mBufferBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         mBufferCanvas = new Canvas(mBufferBitmap);
     }
@@ -119,20 +119,35 @@ public class PaletteView extends View {
             mMode = mode;
             if (mMode == Mode.DRAW) {
                 mPaint.setXfermode(null);
-                mPaint.setStrokeWidth(mDrawSize);
             } else {
                 mPaint.setXfermode(mClearMode);
-                mPaint.setStrokeWidth(mEraserSize);
             }
         }
     }
 
     public void setEraserSize(float size) {
+        if (size <= 0) {
+            return;
+        }
         mEraserSize = size;
+        mPaint.setStrokeWidth(mEraserSize);
     }
 
     public void setPenRawSize(float size) {
+        if (size <= 0) {
+            return;
+        }
+        mDrawSize = size;
+        mPaint.setStrokeWidth(mDrawSize);
+    }
+
+    public void setSize(float size) {
+        if (size <= 0) {
+            return;
+        }
         mEraserSize = size;
+        mDrawSize = size;
+        mPaint.setStrokeWidth(size);
     }
 
     public void setPenColor(int color) {
