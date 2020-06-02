@@ -49,5 +49,9 @@
     <string name="pen">画笔</string>
     <string name="eraser">橡皮</string>
 
+    <!--  temp  -->
+    <string name="temp_symbol">℃</string>
+    <string name="future_weather">未来5天天气情况</string>
+
 
 </resources>

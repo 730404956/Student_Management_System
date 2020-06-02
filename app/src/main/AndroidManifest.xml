@@ -15,17 +15,26 @@
         android:roundIcon="@mipmap/ic"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ActivityWeather">
+            <intent-filter>
+                <action android:name="com.acetering.student_input.QUERY_WEATHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <service
-            android:name="com.acetering.app.service.ClipboardMonitorService"
+            android:name=".service.ClipboardMonitorService"
             android:enabled="true"
             android:exported="true" />
+
         <receiver android:name=".broadcast.StudentRecordBroadcastReceiver">
             <intent-filter>
                 <action android:name="com.acetering.app.CLIPBOARD_MONITOR_ADD_STUDENT" />
             </intent-filter>
         </receiver>
+
         <service
-            android:name="com.acetering.app.service.QueryWeekdayService"
+            android:name=".service.QueryWeekdayService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -33,35 +42,34 @@
             </intent-filter>
         </service>
         <service
-            android:name="com.acetering.app.service.NetworkObserver"
+            android:name=".service.NetworkObserver"
             android:enabled="true"
             android:exported="true" />
 
         <provider
-            android:name="com.acetering.app.share.StudentContentProvider"
+            android:name=".share.StudentContentProvider"
             android:authorities="com.acetering.app.providers.student"
             android:exported="true" />
 
         <activity
-            android:name="com.acetering.app.ActivityConfig"
+            android:name=".ActivityConfig"
             android:label="@string/title_activity_config" />
-        <activity android:name="com.acetering.app.ActivityPhonePlace">
+        <activity android:name=".ActivityPhonePlace">
             <intent-filter>
                 <action android:name="com.acetering.student_input.QUERY_TEL_INFO" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name="com.acetering.app.ViewManagerActivity" />
-        <activity android:name="com.acetering.app.ActivityLogin">
+        <activity android:name=".ViewManagerActivity" />
+        <activity android:name=".ActivityLogin">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.acetering.app.FragmentMain" />
-        <activity android:name="com.acetering.app.FragmentStudent" />
+        <activity android:name=".FragmentMain" />
+        <activity android:name=".FragmentStudent" />
     </application>
 
 </manifest>

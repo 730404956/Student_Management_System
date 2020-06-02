@@ -100,8 +100,10 @@ public class ViewManagerActivity extends AppCompatActivity {
                     bindService(intent, conn, BIND_AUTO_CREATE);
                     query_weekday_dialog = DialogFactory.createQueryWeekdayDialog(this, conn.getiDayOfWeek());
                 }
-
                 query_weekday_dialog.show();
+                break;
+            case R.id.query_weather:
+                startActivity(new Intent("com.acetering.student_input.QUERY_WEATHER"));
         }
         return super.onOptionsItemSelected(item);
     }

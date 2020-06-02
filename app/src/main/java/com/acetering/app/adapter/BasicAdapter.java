@@ -184,6 +184,11 @@ public class BasicAdapter<T> extends BaseAdapter {
             itemView.setBackgroundColor(color);
             return this;
         }
+
+        public ViewHolder setVisibility(int id, int visible) {
+            getInnerView(id).setVisibility(visible);
+            return this;
+        }
     }
 
 }

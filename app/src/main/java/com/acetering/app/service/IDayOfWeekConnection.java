@@ -21,7 +21,6 @@ public final class IDayOfWeekConnection implements ServiceConnection {
     }
 
     public void onServiceConnected(ComponentName name, IBinder service) {
-
         iDayOfWeek = IDayOfWeek.Stub.asInterface(service);
     }
 

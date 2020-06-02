@@ -74,7 +74,10 @@ public class HttpUtil {
     private void sendHttp(String url, Map<String, String> param, boolean isPost) {
         this.mUrl = url;
         this.mParam = param;
-        run(isPost);
+        new Thread(() -> {
+            run(isPost);
+        }).start();
+//        run(isPost);
     }
 
     private void run(boolean isPost) {
@@ -110,8 +113,10 @@ public class HttpUtil {
                                     if (body != null) {
                                         String json = body.string();
                                         int index = json.indexOf("{");
-                                        //make json string
-                                        json = json.substring(index);
+                                        if (index >= 0) {
+                                            //make json string
+                                            json = json.substring(index);
+                                        }
                                         Log.i("HTTP", "run: " + json);
                                         //deal with json response body
                                         mHttpResponse.onSuccess(json);

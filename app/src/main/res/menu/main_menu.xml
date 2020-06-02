@@ -25,6 +25,9 @@
             <item
                 android:id="@+id/query_weekday_item"
                 android:title="日期" />
+            <item
+                android:id="@+id/query_weather"
+                android:title="@string/future_weather" />
         </menu>
     </item>
 
