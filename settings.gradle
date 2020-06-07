@@ -1,3 +1,4 @@
+include ':draw_panel'
 include ':app'
 rootProject.name='StudentMgr'
 include ':otherapp'
